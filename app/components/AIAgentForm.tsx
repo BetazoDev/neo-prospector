@@ -39,7 +39,13 @@ export default function AIAgentForm({ onLeadsFound }: AIAgentFormProps) {
         if (parsed.apiKey) apiKey = parsed.apiKey.trim()
       }
     } catch {
-      // fallback defaults
+      // fallback
+    }
+
+    if (!apiKey) {
+      addLog('Error: Se requiere una API Key de Apify para prospectar. Por favor abre "Configuración" y guarda tu clave.', 'error')
+      setLoading(false)
+      return
     }
 
     addLog(`Iniciando búsqueda: "${niche}" en "${zone}" (Límite: ${maxLeads} prospectos)...`)
@@ -54,7 +60,7 @@ export default function AIAgentForm({ onLeadsFound }: AIAgentFormProps) {
           niche: niche.trim(),
           zone: zone.trim(),
           maxLeads,
-          apiKey: apiKey || undefined,
+          apiKey,
         }),
       })
 

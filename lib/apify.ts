@@ -45,11 +45,13 @@ export async function launchApifyScrape(
   lat: string,
   lon: string,
   maxLeads: number = 100,
-  customApiKey?: string
+  apiKey?: string
 ): Promise<string> {
-  const apiKey = customApiKey || process.env.APIFY_API_KEY
-  if (!apiKey) throw new Error('No se ha configurado la API Key de Apify')
+  if (!apiKey || !apiKey.trim()) {
+    throw new Error('API Key de Apify no configurada. Por favor ingresa una clave válida en Configuración.')
+  }
 
+  const cleanKey = apiKey.trim()
   const searchString = `${niche} en ${zone}`
   const body = {
     language: 'es',
@@ -61,7 +63,7 @@ export async function launchApifyScrape(
   }
 
   const res = await fetch(
-    `https://api.apify.com/v2/acts/${ACTOR_ID}/runs?token=${apiKey}`,
+    `https://api.apify.com/v2/acts/${ACTOR_ID}/runs?token=${cleanKey}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -71,33 +73,33 @@ export async function launchApifyScrape(
 
   if (!res.ok) {
     const err = await res.text()
-    throw new Error(`Apify error: ${err}`)
+    throw new Error(`Error de Apify (${res.status}): ${err}`)
   }
 
   const data = await res.json()
   return data.data.id as string
 }
 
-export async function pollApifyRun(runId: string, customApiKey?: string, maxWaitMs = 300000): Promise<string> {
-  const apiKey = customApiKey || process.env.APIFY_API_KEY
+export async function pollApifyRun(runId: string, apiKey: string, maxWaitMs = 300000): Promise<string> {
+  const cleanKey = apiKey.trim()
   const start = Date.now()
   while (Date.now() - start < maxWaitMs) {
     const res = await fetch(
-      `https://api.apify.com/v2/actor-runs/${runId}?token=${apiKey}`
+      `https://api.apify.com/v2/actor-runs/${runId}?token=${cleanKey}`
     )
     const data = await res.json()
     const status = data.data?.status as string
     if (status === 'SUCCEEDED') return data.data.defaultDatasetId as string
-    if (status === 'FAILED' || status === 'ABORTED') throw new Error(`Apify run failed: ${status}`)
+    if (status === 'FAILED' || status === 'ABORTED') throw new Error(`Ejecución de Apify falló: ${status}`)
     await new Promise((r) => setTimeout(r, 5000))
   }
-  throw new Error('Apify run timed out after 5 minutes')
+  throw new Error('La búsqueda de Apify excedió el tiempo límite de 5 minutos')
 }
 
-export async function fetchApifyResults(datasetId: string, countryCode: string, customApiKey?: string): Promise<ApifyLead[]> {
-  const apiKey = customApiKey || process.env.APIFY_API_KEY
+export async function fetchApifyResults(datasetId: string, countryCode: string, apiKey: string): Promise<ApifyLead[]> {
+  const cleanKey = apiKey.trim()
   const res = await fetch(
-    `https://api.apify.com/v2/datasets/${datasetId}/items?token=${apiKey}&format=json`
+    `https://api.apify.com/v2/datasets/${datasetId}/items?token=${cleanKey}&format=json`
   )
   const items = (await res.json()) as ApifyLead[]
   return items.filter((item) => {

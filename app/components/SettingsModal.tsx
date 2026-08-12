@@ -19,16 +19,19 @@ export default function SettingsModal({
   const [maxLeads, setMaxLeads] = useState<number>(100)
   const [showKey, setShowKey] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
+  const [saveError, setSaveError] = useState('')
 
   // Load saved settings when modal opens
   useEffect(() => {
     if (isOpen) {
+      setSaveSuccess(false)
+      setSaveError('')
       try {
         const saved = localStorage.getItem('neoprospector_settings')
         if (saved) {
           const parsed = JSON.parse(saved)
           if (parsed.apiKey) setApiKey(parsed.apiKey)
-          if (parsed.maxLeads) setMaxLeads(Number(parsed.maxLeads))
+          if (parsed.maxLeads) setMaxLeads(Number(parsed.maxLeads) || 100)
         }
       } catch {
         // ignore fallback
@@ -37,33 +40,42 @@ export default function SettingsModal({
   }, [isOpen])
 
   const handleSaveSettings = () => {
+    setSaveError('')
+    if (!apiKey.trim()) {
+      setSaveError('Por favor ingresa una API Key de Apify válida.')
+      return
+    }
+
     try {
       const settings = {
         apiKey: apiKey.trim(),
-        maxLeads: Number(maxLeads) || 100,
+        maxLeads: Math.max(1, Number(maxLeads) || 100),
       }
       localStorage.setItem('neoprospector_settings', JSON.stringify(settings))
       setSaveSuccess(true)
       setTimeout(() => setSaveSuccess(false), 3000)
     } catch (e) {
       console.error('Error saving settings:', e)
+      setSaveError('No se pudo guardar la configuración en el navegador.')
     }
   }
 
   if (!isOpen) return null
+
+  const isConfigured = Boolean(apiKey.trim())
 
   return (
     <div
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-        backdropFilter: 'blur(6px)',
+        backgroundColor: 'rgba(0, 0, 0, 0.85)',
+        backdropFilter: 'blur(8px)',
         zIndex: 9999,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '20px',
+        padding: '16px',
       }}
       onClick={onClose}
     >
@@ -73,21 +85,23 @@ export default function SettingsModal({
           border: '1px solid var(--border-default)',
           borderRadius: 'var(--radius-xl)',
           width: '100%',
-          maxWidth: '540px',
-          padding: 'var(--space-6)',
-          boxShadow: 'var(--shadow-lg)',
+          maxWidth: '560px',
+          maxHeight: '90vh',
+          overflowY: 'auto',
+          padding: '24px',
+          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.9)',
           position: 'relative',
         }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div
               style={{
-                width: 36,
-                height: 36,
-                borderRadius: 8,
+                width: 40,
+                height: 40,
+                borderRadius: 10,
                 background: 'var(--bg-elevated)',
                 border: '1px solid var(--border-subtle)',
                 display: 'flex',
@@ -96,38 +110,43 @@ export default function SettingsModal({
                 color: '#fff',
               }}
             >
-              <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <svg viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <circle cx="8" cy="8" r="3" />
                 <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" />
               </svg>
             </div>
             <div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>Configuración del Sistema</div>
-              <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>Ajustes de prospección y estado del motor</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>Configuración del Sistema</div>
+              <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>Ajustes de prospección y credenciales de Apify</div>
             </div>
           </div>
           <button
             onClick={onClose}
             style={{
-              background: 'transparent',
-              border: 'none',
+              background: 'var(--bg-elevated)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: 'var(--radius-md)',
               color: 'var(--text-tertiary)',
               cursor: 'pointer',
-              fontSize: 18,
-              padding: 4,
+              fontSize: 16,
+              width: 32,
+              height: 32,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
             ✕
           </button>
         </div>
 
-        {/* Prospecting Custom Settings Form */}
+        {/* Prospecting Settings Form */}
         <div
           style={{
             background: 'var(--bg-elevated)',
             border: '1px solid var(--border-subtle)',
             borderRadius: 'var(--radius-lg)',
-            padding: '16px',
+            padding: '18px',
             marginBottom: 20,
           }}
         >
@@ -139,22 +158,27 @@ export default function SettingsModal({
           </div>
 
           {/* API Key Field */}
-          <div style={{ marginBottom: 14 }}>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 6 }}>
-              Apify API Key (Token)
-            </label>
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)' }}>
+                Apify API Key (Token) <span style={{ color: '#fff' }}>* Requerido</span>
+              </label>
+              <span className={`badge ${isConfigured ? 'badge-success' : 'badge-error'}`} style={{ fontSize: 10 }}>
+                {isConfigured ? 'Configurada' : 'Requerida'}
+              </span>
+            </div>
             <div style={{ display: 'flex', gap: 8 }}>
               <input
                 type={showKey ? 'text' : 'password'}
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
-                placeholder="apify_api_... (opcional)"
+                placeholder="ej. apify_api_bIBSldSBpL..."
                 style={{
                   flex: 1,
                   background: 'var(--bg-surface)',
                   border: '1px solid var(--border-default)',
                   borderRadius: 'var(--radius-md)',
-                  padding: '8px 12px',
+                  padding: '9px 12px',
                   color: '#fff',
                   fontSize: 13,
                   fontFamily: 'monospace',
@@ -171,43 +195,52 @@ export default function SettingsModal({
               </button>
             </div>
             <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 5 }}>
-              Si no especificas una clave, se utilizará la API Key por defecto del servidor.
+              Debes ingresar tu API Key válida para poder lanzar cualquier prospección de leads.
             </div>
           </div>
 
-          {/* Max Leads Select */}
-          <div style={{ marginBottom: 16 }}>
+          {/* Max Leads Input (Direct Number Entry) */}
+          <div style={{ marginBottom: 18 }}>
             <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 6 }}>
-              Límite de Prospectos a Extraer por Búsqueda
+              Número de Prospectos a Extraer por Búsqueda
             </label>
-            <select
-              value={maxLeads}
-              onChange={(e) => setMaxLeads(Number(e.target.value))}
-              style={{
-                width: '100%',
-                background: 'var(--bg-surface)',
-                border: '1px solid var(--border-default)',
-                borderRadius: 'var(--radius-md)',
-                padding: '8px 12px',
-                color: '#fff',
-                fontSize: 13,
-                outline: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              <option value={20}>20 prospectos (Rápido)</option>
-              <option value={50}>50 prospectos (Recomendado)</option>
-              <option value={100}>100 prospectos (Estándar)</option>
-              <option value={200}>200 prospectos (Extensivo)</option>
-              <option value={500}>500 prospectos (Máxima cobertura)</option>
-            </select>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <input
+                type="number"
+                min="1"
+                max="5000"
+                value={maxLeads}
+                onChange={(e) => setMaxLeads(Math.max(1, parseInt(e.target.value) || 1))}
+                placeholder="ej. 50, 100, 250..."
+                style={{
+                  width: '140px',
+                  background: 'var(--bg-surface)',
+                  border: '1px solid var(--border-default)',
+                  borderRadius: 'var(--radius-md)',
+                  padding: '9px 12px',
+                  color: '#fff',
+                  fontSize: 14,
+                  fontWeight: 600,
+                  outline: 'none',
+                }}
+              />
+              <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
+                prospectos objetivo por ejecución
+              </span>
+            </div>
             <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 5 }}>
-              Esta preferencia se guardará en tu navegador y aplicará para todas las búsquedas.
+              Escribe el número exacto de leads que deseas extraer. Se guardará de manera permanente.
             </div>
           </div>
 
-          {/* Save Action */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8 }}>
+          {/* Messages & Actions */}
+          {saveError && (
+            <div style={{ fontSize: 12, color: '#ff6b6b', marginBottom: 12, fontWeight: 600 }}>
+              ⚠️ {saveError}
+            </div>
+          )}
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 6 }}>
             <span style={{ fontSize: 12, color: '#fff', fontWeight: 600, opacity: saveSuccess ? 1 : 0, transition: 'opacity 0.2s' }}>
               ✓ ¡Ajustes guardados correctamente!
             </span>
@@ -239,7 +272,9 @@ export default function SettingsModal({
                 Actor `compass/crawler-google-places`
               </div>
             </div>
-            <span className="badge badge-success">Conectado</span>
+            <span className={`badge ${isConfigured ? 'badge-success' : 'badge-error'}`}>
+              {isConfigured ? 'Listo' : 'Pendiente de Key'}
+            </span>
           </div>
 
           {/* Database status */}

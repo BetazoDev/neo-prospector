@@ -6,17 +6,17 @@ export async function POST(req: NextRequest) {
   try {
     const { niche, zone, maxLeads, apiKey } = await req.json()
     if (!niche || !zone) {
-      return NextResponse.json({ error: 'niche y zone son requeridos' }, { status: 400 })
+      return NextResponse.json({ error: 'Nicho y zona son requeridos' }, { status: 400 })
     }
 
-    const effectiveKey = apiKey || process.env.APIFY_API_KEY
-    if (!effectiveKey || effectiveKey === 'your_apify_api_key_here') {
+    if (!apiKey || typeof apiKey !== 'string' || !apiKey.trim()) {
       return NextResponse.json(
-        { error: 'API Key de Apify no configurada. Configúrala en la sección de Configuración.' },
+        { error: 'Se requiere una API Key de Apify para continuar. Por favor ingresa tu API Key en la sección de Configuración.' },
         { status: 400 }
       )
     }
 
+    const effectiveKey = apiKey.trim()
     const parsedMaxLeads = typeof maxLeads === 'number' && maxLeads > 0 ? maxLeads : 100
 
     // Create job record
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
       // 1. Geocode the zone
       const { lat, lon, countryCode } = await geocodeZone(zone)
 
-      // 2. Launch Apify actor with custom maxLeads and key
+      // 2. Launch Apify actor with user's custom maxLeads and key
       const runId = await launchApifyScrape(niche, zone, lat, lon, parsedMaxLeads, effectiveKey)
       await prisma.scrapingJob.update({
         where: { id: job.id },
