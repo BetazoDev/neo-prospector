@@ -1,9 +1,8 @@
-FROM node:20-alpine AS base
+FROM node:20-slim AS base
 
-# Install dependencies and build tools for C++ native modules (better-sqlite3)
+# Install openssl for Prisma and certs
 FROM base AS deps
-# Invalidate cache v2
-RUN apk add --no-cache libc6-compat openssl python3 make g++ build-base
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
@@ -11,7 +10,7 @@ RUN npm ci
 
 # Rebuild the source code only when needed
 FROM base AS builder
-RUN apk add --no-cache openssl
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -23,7 +22,7 @@ RUN npm run build
 
 # Production image
 FROM base AS runner
-RUN apk add --no-cache libc6-compat openssl
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 ENV NODE_ENV=production
