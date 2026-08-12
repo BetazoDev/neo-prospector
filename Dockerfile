@@ -48,5 +48,5 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Run migrations and start application
-CMD ["sh", "-c", "npx prisma migrate deploy && node server.js"]
+# Sync schema with SQLite database and start server
+CMD ["sh", "-c", "npx prisma db push && node server.js"]
