@@ -1,12 +1,13 @@
 FROM node:22-slim AS base
 
-# Install openssl for Prisma
+# Install openssl and build tools
 FROM base AS deps
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y openssl python3 make g++ build-essential && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
-RUN npm ci
+# Use npm install to properly resolve platform-specific native binaries (better-sqlite3)
+RUN npm install
 
 # Rebuild the source code
 FROM base AS builder
