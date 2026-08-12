@@ -28,7 +28,21 @@ export default function AIAgentForm({ onLeadsFound }: AIAgentFormProps) {
     setLoading(true)
     setLogs([])
 
-    addLog(`Iniciando búsqueda: "${niche}" en "${zone}"...`)
+    // Read stored settings for custom maxLeads and API key
+    let maxLeads = 100
+    let apiKey = ''
+    try {
+      const savedSettings = localStorage.getItem('neoprospector_settings')
+      if (savedSettings) {
+        const parsed = JSON.parse(savedSettings)
+        if (parsed.maxLeads) maxLeads = Number(parsed.maxLeads)
+        if (parsed.apiKey) apiKey = parsed.apiKey.trim()
+      }
+    } catch {
+      // fallback defaults
+    }
+
+    addLog(`Iniciando búsqueda: "${niche}" en "${zone}" (Límite: ${maxLeads} prospectos)...`)
 
     try {
       addLog('Geocodificando zona con OpenStreetMap...')
@@ -36,7 +50,12 @@ export default function AIAgentForm({ onLeadsFound }: AIAgentFormProps) {
       const res = await fetch('/api/scrape', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ niche: niche.trim(), zone: zone.trim() }),
+        body: JSON.stringify({
+          niche: niche.trim(),
+          zone: zone.trim(),
+          maxLeads,
+          apiKey: apiKey || undefined,
+        }),
       })
 
       const data = await res.json()
@@ -48,7 +67,6 @@ export default function AIAgentForm({ onLeadsFound }: AIAgentFormProps) {
       }
 
       addLog('Lanzando actor de Apify en Google Maps...')
-      // Note: The actual steps happen server-side, we show progress optimistically
       addLog('Esperando resultados de Google Maps...')
       addLog('Filtrando por zona geográfica...')
       addLog(`✓ ${data.count} leads encontrados y guardados`, 'done')

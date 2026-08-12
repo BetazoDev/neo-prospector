@@ -1,4 +1,3 @@
-const APIFY_API_KEY = process.env.APIFY_API_KEY!
 const ACTOR_ID = 'nwua9Gu5YrADL7ZDj'
 
 interface GeocodingResult {
@@ -30,7 +29,6 @@ export async function geocodeZone(zone: string): Promise<GeocodingResult> {
   if (!data || data.length === 0) throw new Error(`No se pudo geocodificar la zona: ${zone}`)
   const result = data[0]
 
-  // Extract country code from display_name or use address lookup
   const addressUrl = `https://nominatim.openstreetmap.org/reverse?lat=${result.lat}&lon=${result.lon}&format=json`
   const addrRes = await fetch(addressUrl, {
     headers: { 'User-Agent': 'NeoProspector/1.0' },
@@ -45,12 +43,17 @@ export async function launchApifyScrape(
   niche: string,
   zone: string,
   lat: string,
-  lon: string
+  lon: string,
+  maxLeads: number = 100,
+  customApiKey?: string
 ): Promise<string> {
+  const apiKey = customApiKey || process.env.APIFY_API_KEY
+  if (!apiKey) throw new Error('No se ha configurado la API Key de Apify')
+
   const searchString = `${niche} en ${zone}`
   const body = {
     language: 'es',
-    maxCrawledPlacesPerSearch: 100,
+    maxCrawledPlacesPerSearch: maxLeads,
     searchStringsArray: [searchString],
     lat,
     lng: lon,
@@ -58,7 +61,7 @@ export async function launchApifyScrape(
   }
 
   const res = await fetch(
-    `https://api.apify.com/v2/acts/${ACTOR_ID}/runs?token=${APIFY_API_KEY}`,
+    `https://api.apify.com/v2/acts/${ACTOR_ID}/runs?token=${apiKey}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -75,11 +78,12 @@ export async function launchApifyScrape(
   return data.data.id as string
 }
 
-export async function pollApifyRun(runId: string, maxWaitMs = 300000): Promise<string> {
+export async function pollApifyRun(runId: string, customApiKey?: string, maxWaitMs = 300000): Promise<string> {
+  const apiKey = customApiKey || process.env.APIFY_API_KEY
   const start = Date.now()
   while (Date.now() - start < maxWaitMs) {
     const res = await fetch(
-      `https://api.apify.com/v2/actor-runs/${runId}?token=${APIFY_API_KEY}`
+      `https://api.apify.com/v2/actor-runs/${runId}?token=${apiKey}`
     )
     const data = await res.json()
     const status = data.data?.status as string
@@ -90,14 +94,14 @@ export async function pollApifyRun(runId: string, maxWaitMs = 300000): Promise<s
   throw new Error('Apify run timed out after 5 minutes')
 }
 
-export async function fetchApifyResults(datasetId: string, countryCode: string): Promise<ApifyLead[]> {
+export async function fetchApifyResults(datasetId: string, countryCode: string, customApiKey?: string): Promise<ApifyLead[]> {
+  const apiKey = customApiKey || process.env.APIFY_API_KEY
   const res = await fetch(
-    `https://api.apify.com/v2/datasets/${datasetId}/items?token=${APIFY_API_KEY}&format=json`
+    `https://api.apify.com/v2/datasets/${datasetId}/items?token=${apiKey}&format=json`
   )
-  const items = await res.json() as ApifyLead[]
-  // Filter by country code for geographic precision
+  const items = (await res.json()) as ApifyLead[]
   return items.filter((item) => {
     const itemCC = item.countryCode?.toLowerCase() ?? ''
-    return itemCC === countryCode || itemCC === '' // keep if no country info
+    return itemCC === countryCode || itemCC === ''
   })
 }

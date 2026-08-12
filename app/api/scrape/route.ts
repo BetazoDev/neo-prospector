@@ -4,14 +4,20 @@ import { geocodeZone, launchApifyScrape, pollApifyRun, fetchApifyResults } from 
 
 export async function POST(req: NextRequest) {
   try {
-    const { niche, zone } = await req.json()
+    const { niche, zone, maxLeads, apiKey } = await req.json()
     if (!niche || !zone) {
-      return NextResponse.json({ error: 'niche and zone are required' }, { status: 400 })
+      return NextResponse.json({ error: 'niche y zone son requeridos' }, { status: 400 })
     }
 
-    if (!process.env.APIFY_API_KEY || process.env.APIFY_API_KEY === 'your_apify_api_key_here') {
-      return NextResponse.json({ error: 'APIFY_API_KEY not configured' }, { status: 500 })
+    const effectiveKey = apiKey || process.env.APIFY_API_KEY
+    if (!effectiveKey || effectiveKey === 'your_apify_api_key_here') {
+      return NextResponse.json(
+        { error: 'API Key de Apify no configurada. Configúrala en la sección de Configuración.' },
+        { status: 400 }
+      )
     }
+
+    const parsedMaxLeads = typeof maxLeads === 'number' && maxLeads > 0 ? maxLeads : 100
 
     // Create job record
     const job = await prisma.scrapingJob.create({
@@ -22,18 +28,18 @@ export async function POST(req: NextRequest) {
       // 1. Geocode the zone
       const { lat, lon, countryCode } = await geocodeZone(zone)
 
-      // 2. Launch Apify actor
-      const runId = await launchApifyScrape(niche, zone, lat, lon)
+      // 2. Launch Apify actor with custom maxLeads and key
+      const runId = await launchApifyScrape(niche, zone, lat, lon, parsedMaxLeads, effectiveKey)
       await prisma.scrapingJob.update({
         where: { id: job.id },
         data: { apifyRunId: runId },
       })
 
       // 3. Poll for completion
-      const datasetId = await pollApifyRun(runId)
+      const datasetId = await pollApifyRun(runId, effectiveKey)
 
       // 4. Fetch and filter results
-      const leads = await fetchApifyResults(datasetId, countryCode)
+      const leads = await fetchApifyResults(datasetId, countryCode, effectiveKey)
 
       // 5. Save to DB
       const created = await prisma.$transaction(
