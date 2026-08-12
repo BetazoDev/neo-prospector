@@ -1,6 +1,6 @@
-FROM node:20-slim AS base
+FROM node:22-slim AS base
 
-# Install openssl for Prisma and certs
+# Install openssl for Prisma
 FROM base AS deps
 RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci
 
-# Rebuild the source code only when needed
+# Rebuild the source code
 FROM base AS builder
 RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
