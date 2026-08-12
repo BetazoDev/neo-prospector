@@ -2,7 +2,8 @@ FROM node:20-alpine AS base
 
 # Install dependencies and build tools for C++ native modules (better-sqlite3)
 FROM base AS deps
-RUN apk add --no-cache libc6-compat openssl python3 make g++
+# Invalidate cache v2
+RUN apk add --no-cache libc6-compat openssl python3 make g++ build-base
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
