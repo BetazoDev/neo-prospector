@@ -6,7 +6,8 @@ RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
-RUN npm ci
+# Use npm install to ensure Linux swc/native dependencies are resolved
+RUN npm install
 
 # Rebuild the source code
 FROM base AS builder
