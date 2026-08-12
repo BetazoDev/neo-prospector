@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import Sidebar from './components/Sidebar'
+import Sidebar, { NavItem } from './components/Sidebar'
 import StatsPanel from './components/StatsPanel'
 import AIAgentForm from './components/AIAgentForm'
 import FilterBar from './components/FilterBar'
 import LeadsTable from './components/LeadsTable'
+import SettingsModal from './components/SettingsModal'
 
 interface Lead {
   id: number
@@ -45,6 +46,10 @@ export default function DashboardPage() {
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
   const [pages, setPages] = useState(1)
+
+  // Navigation & Modals
+  const [activeNav, setActiveNav] = useState<NavItem>('dashboard')
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
   // Filters
   const [search, setSearch] = useState('')
@@ -105,9 +110,57 @@ export default function DashboardPage() {
     setTimeout(() => fetchLeads(1), 500)
   }
 
+  // Sidebar navigation handler
+  const handleNavigate = (nav: NavItem) => {
+    setActiveNav(nav)
+
+    if (nav === 'dashboard') {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    } else if (nav === 'agent') {
+      const el = document.getElementById('agent-section')
+      if (el) el.scrollIntoView({ behavior: 'smooth' })
+      const input = document.getElementById('niche-input') as HTMLInputElement
+      if (input) input.focus()
+    } else if (nav === 'leads') {
+      const el = document.getElementById('leads-section')
+      if (el) el.scrollIntoView({ behavior: 'smooth' })
+    } else if (nav === 'settings') {
+      setIsSettingsOpen(true)
+    }
+  }
+
+  // Export to CSV
+  const handleExportCSV = () => {
+    if (leads.length === 0) return
+    const headers = ['ID', 'Empresa', 'Categoría', 'Teléfono', 'Rating', 'Reseñas', 'Ciudad', 'Dirección', 'Sitio Web', 'Google Maps']
+    const rows = leads.map((l) => [
+      l.id,
+      `"${l.title.replace(/"/g, '""')}"`,
+      `"${(l.category ?? '').replace(/"/g, '""')}"`,
+      `"${l.phone ?? ''}"`,
+      l.rating ?? '',
+      l.reviewsCount ?? '',
+      `"${(l.city ?? '').replace(/"/g, '""')}"`,
+      `"${(l.address ?? '').replace(/"/g, '""')}"`,
+      `"${l.website ?? ''}"`,
+      `"${l.mapsUrl ?? ''}"`,
+    ])
+
+    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n')
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `neo-prospector-leads-${new Date().toISOString().split('T')[0]}.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    showToast('Exportación iniciada', 'Se descargó el archivo CSV con tus leads')
+  }
+
   return (
     <>
-      <Sidebar />
+      <Sidebar activeNav={activeNav} onNavigate={handleNavigate} />
 
       <main className="main-content">
         {/* Top bar */}
@@ -139,34 +192,49 @@ export default function DashboardPage() {
           <StatsPanel stats={stats} loading={loading && stats.total === 0} />
 
           {/* AI Agent Form */}
-          <AIAgentForm onLeadsFound={handleLeadsFound} />
+          <div id="agent-section">
+            <AIAgentForm onLeadsFound={handleLeadsFound} />
+          </div>
 
-          {/* Filter Bar */}
-          <FilterBar
-            search={search}
-            onSearchChange={setSearch}
-            sort={sort}
-            onSortChange={setSort}
-            withPhone={withPhone}
-            onWithPhoneChange={setWithPhone}
-            view={view}
-            onViewChange={setView}
-            total={total}
-          />
+          {/* Filter Bar & Leads Section */}
+          <div id="leads-section">
+            <FilterBar
+              search={search}
+              onSearchChange={setSearch}
+              sort={sort}
+              onSortChange={setSort}
+              withPhone={withPhone}
+              onWithPhoneChange={setWithPhone}
+              view={view}
+              onViewChange={setView}
+              total={total}
+            />
 
-          {/* Leads */}
-          <LeadsTable
-            leads={leads}
-            view={view}
-            total={total}
-            page={page}
-            pages={pages}
-            onPageChange={fetchLeads}
-            onDelete={handleDelete}
-            loading={loading}
-          />
+            {/* Leads */}
+            <LeadsTable
+              leads={leads}
+              view={view}
+              total={total}
+              page={page}
+              pages={pages}
+              onPageChange={fetchLeads}
+              onDelete={handleDelete}
+              loading={loading}
+            />
+          </div>
         </div>
       </main>
+
+      {/* Settings Modal */}
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => {
+          setIsSettingsOpen(false)
+          setActiveNav('dashboard')
+        }}
+        totalLeads={stats.total}
+        onExportCSV={handleExportCSV}
+      />
 
       {/* Toast */}
       {toast && (

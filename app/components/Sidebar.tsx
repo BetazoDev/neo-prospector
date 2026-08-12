@@ -1,6 +1,13 @@
 'use client'
 
-export default function Sidebar() {
+export type NavItem = 'dashboard' | 'leads' | 'agent' | 'settings'
+
+interface SidebarProps {
+  activeNav: NavItem
+  onNavigate: (nav: NavItem) => void
+}
+
+export default function Sidebar({ activeNav, onNavigate }: SidebarProps) {
   return (
     <aside className="sidebar">
       {/* Logo */}
@@ -16,7 +23,11 @@ export default function Sidebar() {
       <nav className="sidebar-nav">
         <div className="sidebar-section-label" style={{ marginTop: 0 }}>Principal</div>
 
-        <a href="/" className="sidebar-nav-item active">
+        <button
+          type="button"
+          className={`sidebar-nav-item ${activeNav === 'dashboard' ? 'active' : ''}`}
+          onClick={() => onNavigate('dashboard')}
+        >
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
             <rect x="1" y="1" width="6" height="6" rx="1.5" />
             <rect x="9" y="1" width="6" height="6" rx="1.5" />
@@ -24,41 +35,57 @@ export default function Sidebar() {
             <rect x="9" y="9" width="6" height="6" rx="1.5" />
           </svg>
           Dashboard
-        </a>
+        </button>
 
-        <a href="/" className="sidebar-nav-item">
+        <button
+          type="button"
+          className={`sidebar-nav-item ${activeNav === 'leads' ? 'active' : ''}`}
+          onClick={() => onNavigate('leads')}
+        >
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
             <path d="M2 4h12M2 8h12M2 12h8" strokeLinecap="round" />
           </svg>
           Todos los Leads
-        </a>
+        </button>
 
         <div className="sidebar-section-label" style={{ marginTop: 20 }}>Herramientas</div>
 
-        <a href="/" className="sidebar-nav-item">
+        <button
+          type="button"
+          className={`sidebar-nav-item ${activeNav === 'agent' ? 'active' : ''}`}
+          onClick={() => onNavigate('agent')}
+        >
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
             <circle cx="8" cy="6" r="3" />
             <path d="M2 14c0-3.314 2.686-5 6-5s6 1.686 6 5" strokeLinecap="round" />
           </svg>
           Agente IA
-        </a>
+        </button>
 
-        <a href="/" className="sidebar-nav-item">
+        <button
+          type="button"
+          className={`sidebar-nav-item ${activeNav === 'agent' ? 'active' : ''}`}
+          onClick={() => onNavigate('agent')}
+        >
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
             <path d="M8 2v12M2 8h12" strokeLinecap="round" />
           </svg>
           Nueva Búsqueda
-        </a>
+        </button>
 
         <div className="sidebar-section-label" style={{ marginTop: 20 }}>Sistema</div>
 
-        <a href="/" className="sidebar-nav-item">
+        <button
+          type="button"
+          className={`sidebar-nav-item ${activeNav === 'settings' ? 'active' : ''}`}
+          onClick={() => onNavigate('settings')}
+        >
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
             <circle cx="8" cy="8" r="3" />
             <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" strokeLinecap="round" />
           </svg>
           Configuración
-        </a>
+        </button>
       </nav>
 
       {/* Footer */}
