@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import Sidebar, { NavItem } from './components/Sidebar'
 import StatsPanel from './components/StatsPanel'
 import AIAgentForm from './components/AIAgentForm'
+import SearchTabs, { JobTab } from './components/SearchTabs'
 import FilterBar from './components/FilterBar'
 import LeadsTable from './components/LeadsTable'
 import SettingsModal from './components/SettingsModal'
@@ -40,12 +42,18 @@ interface ApiResponse {
 }
 
 export default function DashboardPage() {
+  const router = useRouter()
+
   const [leads, setLeads] = useState<Lead[]>([])
   const [stats, setStats] = useState<Stats>({ total: 0, withPhone: 0, avgRating: null, totalReviews: null })
   const [loading, setLoading] = useState(true)
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
   const [pages, setPages] = useState(1)
+
+  // Search Jobs / Airtable Tabs State
+  const [jobs, setJobs] = useState<JobTab[]>([])
+  const [activeJobId, setActiveJobId] = useState<number | 'all'>('all')
 
   // Navigation & Modals
   const [activeNav, setActiveNav] = useState<NavItem>('dashboard')
@@ -65,49 +73,103 @@ export default function DashboardPage() {
     setTimeout(() => setToast(null), 4000)
   }
 
-  const fetchLeads = useCallback(async (p = 1) => {
-    setLoading(true)
+  // Fetch search jobs list
+  const fetchJobs = useCallback(async () => {
     try {
-      const params = new URLSearchParams({
-        page: String(p),
-        sort,
-        search,
-        withPhone: String(withPhone),
-        limit: '50',
-      })
-      const res = await fetch(`/api/leads?${params}`)
-      const data: ApiResponse = await res.json()
-      setLeads(data.leads)
-      setStats(data.stats)
-      setTotal(data.total)
-      setPages(data.pages)
-      setPage(p)
+      const res = await fetch('/api/jobs')
+      if (res.ok) {
+        const data = await res.json()
+        setJobs(data)
+      }
     } catch (err) {
-      console.error(err)
-    } finally {
-      setLoading(false)
+      console.error('Error fetching jobs:', err)
     }
-  }, [sort, search, withPhone])
+  }, [])
 
-  // Debounced search
+  // Fetch leads for selected tab
+  const fetchLeads = useCallback(
+    async (p = 1) => {
+      setLoading(true)
+      try {
+        const params = new URLSearchParams({
+          page: String(p),
+          sort,
+          search,
+          withPhone: String(withPhone),
+          jobId: String(activeJobId),
+          limit: '100',
+        })
+        const res = await fetch(`/api/leads?${params}`)
+        if (res.status === 401) {
+          router.push('/login')
+          return
+        }
+        const data: ApiResponse = await res.json()
+        setLeads(data.leads)
+        setStats(data.stats)
+        setTotal(data.total)
+        setPages(data.pages)
+        setPage(p)
+      } catch (err) {
+        console.error(err)
+      } finally {
+        setLoading(false)
+      }
+    },
+    [sort, search, withPhone, activeJobId, router]
+  )
+
+  useEffect(() => {
+    fetchJobs()
+  }, [fetchJobs])
+
+  // Debounced search & tab change trigger
   useEffect(() => {
     const timer = setTimeout(() => fetchLeads(1), 300)
     return () => clearTimeout(timer)
   }, [fetchLeads])
 
-  const handleDelete = async (id: number) => {
+  const handleDeleteLead = async (id: number) => {
     try {
       await fetch(`/api/leads?id=${id}`, { method: 'DELETE' })
       showToast('Lead eliminado', 'El lead fue removido de la base de datos')
       fetchLeads(page)
+      fetchJobs()
     } catch {
       showToast('Error', 'No se pudo eliminar el lead', 'error')
     }
   }
 
+  const handleDeleteJob = async (jobId: number) => {
+    try {
+      const res = await fetch(`/api/jobs?id=${jobId}`, { method: 'DELETE' })
+      if (res.ok) {
+        showToast('Búsqueda eliminada', 'Se removió la búsqueda y sus prospectos')
+        if (activeJobId === jobId) {
+          setActiveJobId('all')
+        }
+        fetchJobs()
+        fetchLeads(1)
+      }
+    } catch {
+      showToast('Error', 'No se pudo eliminar la búsqueda', 'error')
+    }
+  }
+
   const handleLeadsFound = () => {
-    showToast('¡Prospección completada!', 'Se encontraron nuevos leads. Actualizando tabla...')
+    showToast('¡Prospección completada!', 'Se encontraron nuevos leads. Actualizando pestañas y tabla...')
+    fetchJobs()
     setTimeout(() => fetchLeads(1), 500)
+  }
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+      router.push('/login')
+      router.refresh()
+    } catch {
+      router.push('/login')
+    }
   }
 
   // Sidebar navigation handler
@@ -132,7 +194,20 @@ export default function DashboardPage() {
   // Export to CSV
   const handleExportCSV = () => {
     if (leads.length === 0) return
-    const headers = ['ID', 'Empresa', 'Categoría', 'Teléfono', 'Rating', 'Reseñas', 'Ciudad', 'Dirección', 'Sitio Web', 'Google Maps']
+    const headers = [
+      'ID',
+      'Empresa',
+      'Categoría',
+      'Teléfono',
+      'Rating',
+      'Reseñas',
+      'Ciudad',
+      'Dirección',
+      'Sitio Web',
+      'Google Maps',
+      'Nicho Búsqueda',
+      'Zona Búsqueda',
+    ]
     const rows = leads.map((l) => [
       l.id,
       `"${l.title.replace(/"/g, '""')}"`,
@@ -144,6 +219,8 @@ export default function DashboardPage() {
       `"${(l.address ?? '').replace(/"/g, '""')}"`,
       `"${l.website ?? ''}"`,
       `"${l.mapsUrl ?? ''}"`,
+      `"${l.searchNiche ?? ''}"`,
+      `"${l.searchZone ?? ''}"`,
     ])
 
     const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n')
@@ -175,7 +252,10 @@ export default function DashboardPage() {
             </span>
             <button
               className="btn btn-ghost btn-sm"
-              onClick={() => fetchLeads(page)}
+              onClick={() => {
+                fetchJobs()
+                fetchLeads(page)
+              }}
               title="Actualizar"
             >
               <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 13, height: 13 }}>
@@ -183,6 +263,14 @@ export default function DashboardPage() {
                 <path d="M11 1v3h-3M3 13v-3h3" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               Actualizar
+            </button>
+            <button
+              className="btn btn-ghost btn-sm"
+              onClick={handleLogout}
+              title="Cerrar Sesión"
+              style={{ color: '#ef4444' }}
+            >
+              Cerrar Sesión
             </button>
           </div>
         </div>
@@ -196,8 +284,17 @@ export default function DashboardPage() {
             <AIAgentForm onLeadsFound={handleLeadsFound} />
           </div>
 
-          {/* Filter Bar & Leads Section */}
+          {/* Search Tabs & Filter Bar & Leads Section */}
           <div id="leads-section">
+            {/* Airtable-style Search Tabs */}
+            <SearchTabs
+              jobs={jobs}
+              activeJobId={activeJobId}
+              onSelectTab={(id) => setActiveJobId(id)}
+              onDeleteJob={handleDeleteJob}
+              totalLeadsCount={stats.total}
+            />
+
             <FilterBar
               search={search}
               onSearchChange={setSearch}
@@ -218,7 +315,7 @@ export default function DashboardPage() {
               page={page}
               pages={pages}
               onPageChange={fetchLeads}
-              onDelete={handleDelete}
+              onDelete={handleDeleteLead}
               loading={loading}
             />
           </div>

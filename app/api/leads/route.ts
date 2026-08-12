@@ -6,10 +6,16 @@ export async function GET(req: NextRequest) {
   const sort = searchParams.get('sort') ?? 'newest'
   const search = searchParams.get('search') ?? ''
   const withPhone = searchParams.get('withPhone') === 'true'
+  const jobId = searchParams.get('jobId')
   const page = parseInt(searchParams.get('page') ?? '1')
-  const limit = parseInt(searchParams.get('limit') ?? '50')
+  const limit = parseInt(searchParams.get('limit') ?? '100')
 
   const where: Record<string, unknown> = {}
+
+  if (jobId && jobId !== 'all') {
+    where.jobId = parseInt(jobId)
+  }
+
   if (search) {
     where.OR = [
       { title: { contains: search } },
@@ -40,14 +46,15 @@ export async function GET(req: NextRequest) {
     prisma.lead.count({ where }),
   ])
 
-  // Stats
+  // Stats for the active scope
   const stats = await prisma.lead.aggregate({
+    where,
     _count: { id: true },
     _avg: { rating: true },
     _sum: { reviewsCount: true },
   })
   const withPhoneCount = await prisma.lead.count({
-    where: { phone: { not: null } },
+    where: { ...where, phone: { not: null } },
   })
 
   return NextResponse.json({

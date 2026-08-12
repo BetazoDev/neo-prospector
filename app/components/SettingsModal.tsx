@@ -15,7 +15,8 @@ export default function SettingsModal({
   totalLeads,
   onExportCSV,
 }: SettingsModalProps) {
-  const [apiKey, setApiKey] = useState('')
+  const [apiKeyInput, setApiKeyInput] = useState('')
+  const [hasSavedKey, setHasSavedKey] = useState(false)
   const [maxLeads, setMaxLeads] = useState<number>(100)
   const [showKey, setShowKey] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
@@ -30,28 +31,35 @@ export default function SettingsModal({
         const saved = localStorage.getItem('neoprospector_settings')
         if (saved) {
           const parsed = JSON.parse(saved)
-          if (parsed.apiKey) setApiKey(parsed.apiKey)
+          if (parsed.apiKey && parsed.apiKey.trim()) {
+            setHasSavedKey(true)
+            setApiKeyInput(parsed.apiKey.trim())
+          } else {
+            setHasSavedKey(false)
+            setApiKeyInput('')
+          }
           if (parsed.maxLeads) setMaxLeads(Number(parsed.maxLeads) || 100)
         }
       } catch {
-        // ignore fallback
+        // fallback
       }
     }
   }, [isOpen])
 
   const handleSaveSettings = () => {
     setSaveError('')
-    if (!apiKey.trim()) {
+    if (!apiKeyInput.trim()) {
       setSaveError('Por favor ingresa una API Key de Apify válida.')
       return
     }
 
     try {
       const settings = {
-        apiKey: apiKey.trim(),
+        apiKey: apiKeyInput.trim(),
         maxLeads: Math.max(1, Number(maxLeads) || 100),
       }
       localStorage.setItem('neoprospector_settings', JSON.stringify(settings))
+      setHasSavedKey(true)
       setSaveSuccess(true)
       setTimeout(() => setSaveSuccess(false), 3000)
     } catch (e) {
@@ -60,9 +68,13 @@ export default function SettingsModal({
     }
   }
 
-  if (!isOpen) return null
+  const handleClearApiKey = () => {
+    localStorage.removeItem('neoprospector_settings')
+    setApiKeyInput('')
+    setHasSavedKey(false)
+  }
 
-  const isConfigured = Boolean(apiKey.trim())
+  if (!isOpen) return null
 
   return (
     <div
@@ -86,10 +98,10 @@ export default function SettingsModal({
           borderRadius: 'var(--radius-xl)',
           width: '100%',
           maxWidth: '560px',
-          maxHeight: '90vh',
+          maxHeight: '85vh',
           overflowY: 'auto',
           padding: '24px',
-          boxShadow: '0 20px 50px rgba(0, 0, 0, 0.9)',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.95)',
           position: 'relative',
         }}
         onClick={(e) => e.stopPropagation()}
@@ -163,15 +175,16 @@ export default function SettingsModal({
               <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)' }}>
                 Apify API Key (Token) <span style={{ color: '#fff' }}>* Requerido</span>
               </label>
-              <span className={`badge ${isConfigured ? 'badge-success' : 'badge-error'}`} style={{ fontSize: 10 }}>
-                {isConfigured ? 'Configurada' : 'Requerida'}
+              <span className={`badge ${hasSavedKey ? 'badge-success' : 'badge-error'}`} style={{ fontSize: 10 }}>
+                {hasSavedKey ? 'Configurada (Protegida)' : 'Requerida'}
               </span>
             </div>
+
             <div style={{ display: 'flex', gap: 8 }}>
               <input
                 type={showKey ? 'text' : 'password'}
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
+                value={apiKeyInput}
+                onChange={(e) => setApiKeyInput(e.target.value)}
                 placeholder="ej. apify_api_bIBSldSBpL..."
                 style={{
                   flex: 1,
@@ -193,9 +206,20 @@ export default function SettingsModal({
               >
                 {showKey ? 'Ocultar' : 'Mostrar'}
               </button>
+              {hasSavedKey && (
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={handleClearApiKey}
+                  style={{ padding: '0 10px', fontSize: 12, color: '#ef4444' }}
+                  title="Borrar clave guardada"
+                >
+                  Borrar
+                </button>
+              )}
             </div>
             <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 5 }}>
-              Debes ingresar tu API Key válida para poder lanzar cualquier prospección de leads.
+              Esta API Key no se transmite ni se expone a terceros en respuestas JSON ni HTML.
             </div>
           </div>
 
@@ -225,11 +249,11 @@ export default function SettingsModal({
                 }}
               />
               <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
-                prospectos objetivo por ejecución
+                prospectos por ejecución
               </span>
             </div>
             <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 5 }}>
-              Escribe el número exacto de leads que deseas extraer. Se guardará de manera permanente.
+              Escribe el número exacto de prospectos a extraer por cada búsqueda.
             </div>
           </div>
 
@@ -272,8 +296,8 @@ export default function SettingsModal({
                 Actor `compass/crawler-google-places`
               </div>
             </div>
-            <span className={`badge ${isConfigured ? 'badge-success' : 'badge-error'}`}>
-              {isConfigured ? 'Listo' : 'Pendiente de Key'}
+            <span className={`badge ${hasSavedKey ? 'badge-success' : 'badge-error'}`}>
+              {hasSavedKey ? 'Listo' : 'Requiere Key'}
             </span>
           </div>
 

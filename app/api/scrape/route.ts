@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
       // 4. Fetch and filter results
       const leads = await fetchApifyResults(datasetId, countryCode, effectiveKey)
 
-      // 5. Save to DB
+      // 5. Save to DB linked to job.id
       const created = await prisma.$transaction(
         leads.map((lead) =>
           prisma.lead.create({
@@ -58,6 +58,7 @@ export async function POST(req: NextRequest) {
               searchNiche: niche,
               searchZone: zone,
               countryCode,
+              jobId: job.id,
             },
           })
         )
