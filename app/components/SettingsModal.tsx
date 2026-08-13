@@ -22,31 +22,55 @@ export default function SettingsModal({
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [saveError, setSaveError] = useState('')
 
-  // Load saved settings when modal opens
+  // Load saved settings from server DB session when modal opens
   useEffect(() => {
     if (isOpen) {
       setSaveSuccess(false)
       setSaveError('')
-      try {
-        const saved = localStorage.getItem('neoprospector_settings')
-        if (saved) {
-          const parsed = JSON.parse(saved)
-          if (parsed.apiKey && parsed.apiKey.trim()) {
+
+      fetch('/api/settings')
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (data && data.apiKey) {
+            setApiKeyInput(data.apiKey)
             setHasSavedKey(true)
-            setApiKeyInput(parsed.apiKey.trim())
+            if (data.maxLeads) setMaxLeads(Number(data.maxLeads))
           } else {
-            setHasSavedKey(false)
-            setApiKeyInput('')
+            // Local storage fallback
+            const saved = localStorage.getItem('neoprospector_settings')
+            if (saved) {
+              const parsed = JSON.parse(saved)
+              if (parsed.apiKey && parsed.apiKey.trim()) {
+                setHasSavedKey(true)
+                setApiKeyInput(parsed.apiKey.trim())
+              } else {
+                setHasSavedKey(false)
+                setApiKeyInput('')
+              }
+              if (parsed.maxLeads) setMaxLeads(Number(parsed.maxLeads) || 100)
+            }
           }
-          if (parsed.maxLeads) setMaxLeads(Number(parsed.maxLeads) || 100)
-        }
-      } catch {
-        // fallback
-      }
+        })
+        .catch(() => {
+          // Fallback to localStorage
+          try {
+            const saved = localStorage.getItem('neoprospector_settings')
+            if (saved) {
+              const parsed = JSON.parse(saved)
+              if (parsed.apiKey && parsed.apiKey.trim()) {
+                setHasSavedKey(true)
+                setApiKeyInput(parsed.apiKey.trim())
+              }
+              if (parsed.maxLeads) setMaxLeads(Number(parsed.maxLeads) || 100)
+            }
+          } catch {
+            // ignore
+          }
+        })
     }
   }, [isOpen])
 
-  const handleSaveSettings = () => {
+  const handleSaveSettings = async () => {
     setSaveError('')
     if (!apiKeyInput.trim()) {
       setSaveError('Por favor ingresa una API Key de Apify válida.')
@@ -54,24 +78,45 @@ export default function SettingsModal({
     }
 
     try {
-      const settings = {
-        apiKey: apiKeyInput.trim(),
-        maxLeads: Math.max(1, Number(maxLeads) || 100),
+      const cleanKey = apiKeyInput.trim()
+      const cleanMax = Math.max(1, Number(maxLeads) || 100)
+
+      const res = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ apiKey: cleanKey, maxLeads: cleanMax }),
+      })
+
+      if (!res.ok) {
+        const err = await res.json()
+        setSaveError(err.error || 'No se pudo guardar la configuración.')
+        return
       }
-      localStorage.setItem('neoprospector_settings', JSON.stringify(settings))
+
+      // Sync with localStorage backup
+      localStorage.setItem('neoprospector_settings', JSON.stringify({ apiKey: cleanKey, maxLeads: cleanMax }))
       setHasSavedKey(true)
       setSaveSuccess(true)
       setTimeout(() => setSaveSuccess(false), 3000)
     } catch (e) {
       console.error('Error saving settings:', e)
-      setSaveError('No se pudo guardar la configuración en el navegador.')
+      setSaveError('No se pudo guardar la configuración en el servidor.')
     }
   }
 
-  const handleClearApiKey = () => {
+  const handleClearApiKey = async () => {
     localStorage.removeItem('neoprospector_settings')
     setApiKeyInput('')
     setHasSavedKey(false)
+    try {
+      await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ apiKey: ' ', maxLeads: maxLeads }),
+      })
+    } catch {
+      // ignore
+    }
   }
 
   if (!isOpen) return null

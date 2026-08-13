@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { geocodeZone, launchApifyScrape, pollApifyRun, fetchApifyResults } from '@/lib/apify'
+import { getTokenFromRequest, verifyToken } from '@/lib/auth'
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,14 +10,37 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Nicho y zona son requeridos' }, { status: 400 })
     }
 
-    if (!apiKey || typeof apiKey !== 'string' || !apiKey.trim()) {
+    let effectiveKey = typeof apiKey === 'string' && apiKey.trim() ? apiKey.trim() : ''
+
+    // If apiKey is missing or empty, fetch from authenticated user session in DB
+    if (!effectiveKey) {
+      const token = getTokenFromRequest(req)
+      if (token) {
+        const payload = await verifyToken(token)
+        if (payload?.userId) {
+          const user = await prisma.user.findUnique({
+            where: { id: payload.userId },
+            select: { apifyApiKey: true },
+          })
+          if (user?.apifyApiKey) {
+            effectiveKey = user.apifyApiKey
+          }
+        }
+      }
+    }
+
+    // Secondary fallback to environment variable
+    if (!effectiveKey) {
+      effectiveKey = process.env.APIFY_API_KEY || ''
+    }
+
+    if (!effectiveKey) {
       return NextResponse.json(
         { error: 'Se requiere una API Key de Apify para continuar. Por favor ingresa tu API Key en la sección de Configuración.' },
         { status: 400 }
       )
     }
 
-    const effectiveKey = apiKey.trim()
     const parsedMaxLeads = typeof maxLeads === 'number' && maxLeads > 0 ? maxLeads : 100
 
     // Create job record

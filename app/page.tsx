@@ -58,6 +58,7 @@ export default function DashboardPage() {
   // Navigation & Modals
   const [activeNav, setActiveNav] = useState<NavItem>('dashboard')
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   // Filters
   const [search, setSearch] = useState('')
@@ -237,17 +238,34 @@ export default function DashboardPage() {
 
   return (
     <>
-      <Sidebar activeNav={activeNav} onNavigate={handleNavigate} />
+      <Sidebar
+        activeNav={activeNav}
+        onNavigate={handleNavigate}
+        mobileOpen={isMobileMenuOpen}
+        onCloseMobile={() => setIsMobileMenuOpen(false)}
+      />
 
       <main className="main-content">
         {/* Top bar */}
         <div className="topbar">
-          <div className="topbar-title">
-            <div className="topbar-accent-bar" />
-            Dashboard de Leads
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <button
+              className="topbar-mobile-btn"
+              onClick={() => setIsMobileMenuOpen(true)}
+              aria-label="Abrir menú"
+            >
+              <svg viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path d="M2 4h12M2 8h12M2 12h12" strokeLinecap="round" />
+              </svg>
+            </button>
+            <div className="topbar-title">
+              <div className="topbar-accent-bar" />
+              Dashboard de Leads
+            </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span className="desktop-only-hide" style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
               prospector.diabolicalservices.tech
             </span>
             <button
@@ -262,7 +280,7 @@ export default function DashboardPage() {
                 <path d="M1 7A6 6 0 0 1 7 1c1.97 0 3.7.95 4.8 2.4M13 7A6 6 0 0 1 7 13c-1.97 0-3.7-.95-4.8-2.4" strokeLinecap="round" />
                 <path d="M11 1v3h-3M3 13v-3h3" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              Actualizar
+              <span className="desktop-only-hide">Actualizar</span>
             </button>
             <button
               className="btn btn-ghost btn-sm"
@@ -270,7 +288,10 @@ export default function DashboardPage() {
               title="Cerrar Sesión"
               style={{ color: '#ef4444' }}
             >
-              Cerrar Sesión
+              <span className="desktop-only-hide">Cerrar Sesión</span>
+              <svg className="topbar-mobile-btn" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 13, height: 13, display: 'inline' }}>
+                <path d="M5 2H2v10h3M9 10l3-3-3-3M12 7H5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </button>
           </div>
         </div>
@@ -321,6 +342,57 @@ export default function DashboardPage() {
           </div>
         </div>
       </main>
+
+      {/* Mobile Bottom Navigation Bar */}
+      <nav className="bottom-nav">
+        <button
+          type="button"
+          className={`bottom-nav-item ${activeNav === 'dashboard' ? 'active' : ''}`}
+          onClick={() => handleNavigate('dashboard')}
+        >
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <rect x="1" y="1" width="6" height="6" rx="1.5" />
+            <rect x="9" y="1" width="6" height="6" rx="1.5" />
+            <rect x="1" y="9" width="6" height="6" rx="1.5" />
+            <rect x="9" y="9" width="6" height="6" rx="1.5" />
+          </svg>
+          Inicio
+        </button>
+
+        <button
+          type="button"
+          className={`bottom-nav-item ${activeNav === 'agent' ? 'active' : ''}`}
+          onClick={() => handleNavigate('agent')}
+        >
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M8 2v12M2 8h12" strokeLinecap="round" />
+          </svg>
+          Prospectar
+        </button>
+
+        <button
+          type="button"
+          className={`bottom-nav-item ${activeNav === 'leads' ? 'active' : ''}`}
+          onClick={() => handleNavigate('leads')}
+        >
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M2 4h12M2 8h12M2 12h8" strokeLinecap="round" />
+          </svg>
+          Leads
+        </button>
+
+        <button
+          type="button"
+          className={`bottom-nav-item ${activeNav === 'settings' ? 'active' : ''}`}
+          onClick={() => handleNavigate('settings')}
+        >
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <circle cx="8" cy="8" r="3" />
+            <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" strokeLinecap="round" />
+          </svg>
+          Ajustes
+        </button>
+      </nav>
 
       {/* Settings Modal */}
       <SettingsModal

@@ -28,24 +28,31 @@ export default function AIAgentForm({ onLeadsFound }: AIAgentFormProps) {
     setLoading(true)
     setLogs([])
 
-    // Read stored settings for custom maxLeads and API key
+    // Read stored settings from server DB session or localStorage
     let maxLeads = 100
     let apiKey = ''
     try {
-      const savedSettings = localStorage.getItem('neoprospector_settings')
-      if (savedSettings) {
-        const parsed = JSON.parse(savedSettings)
-        if (parsed.maxLeads) maxLeads = Number(parsed.maxLeads)
-        if (parsed.apiKey) apiKey = parsed.apiKey.trim()
+      const settingsRes = await fetch('/api/settings')
+      if (settingsRes.ok) {
+        const settingsData = await settingsRes.json()
+        if (settingsData.apiKey) apiKey = settingsData.apiKey
+        if (settingsData.maxLeads) maxLeads = Number(settingsData.maxLeads)
       }
     } catch {
-      // fallback
+      // ignore
     }
 
     if (!apiKey) {
-      addLog('Error: Se requiere una API Key de Apify para prospectar. Por favor abre "Configuración" y guarda tu clave.', 'error')
-      setLoading(false)
-      return
+      try {
+        const savedSettings = localStorage.getItem('neoprospector_settings')
+        if (savedSettings) {
+          const parsed = JSON.parse(savedSettings)
+          if (parsed.maxLeads) maxLeads = Number(parsed.maxLeads)
+          if (parsed.apiKey) apiKey = parsed.apiKey.trim()
+        }
+      } catch {
+        // fallback
+      }
     }
 
     addLog(`Iniciando búsqueda: "${niche}" en "${zone}" (Límite: ${maxLeads} prospectos)...`)
