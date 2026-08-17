@@ -1,10 +1,9 @@
 #!/bin/sh
-set -e
+echo "[entrypoint] Starting Next.js production server on port 3000..."
 
-echo "[entrypoint] Syncing Prisma schema with PostgreSQL database..."
+# Run DB schema push in background so boot never fails or blocks
 if [ -n "$DATABASE_URL" ]; then
-  npx prisma db push --accept-data-loss || echo "[entrypoint] Warning: Prisma schema push failed, continuing to start server..."
+  (npx prisma db push --accept-data-loss || true) &
 fi
 
-echo "[entrypoint] Starting Next.js production server on port 3000..."
-exec npm run start -- -p 3000 -H 0.0.0.0
+exec npm run start
