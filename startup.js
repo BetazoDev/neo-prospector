@@ -1,35 +1,45 @@
 #!/usr/bin/env node
-// startup.js — start Next.js HTTP server immediately so Docker healthchecks pass without timeout,
-// and sync Prisma schema asynchronously in the background.
-
+// startup.js — launch Next.js immediately and push Prisma schema in background
 const { exec } = require('child_process')
+const { spawn } = require('child_process')
 const path = require('path')
 
-console.log('[startup] Launching Next.js server on port 3000...')
+const SERVER_PATH = path.join(__dirname, '.next', 'standalone', 'server.js')
+const SCHEMA_PATH = path.join(__dirname, 'prisma', 'schema.prisma')
+const PRISMA_CLI  = path.join(__dirname, 'node_modules', 'prisma', 'build', 'index.js')
+const DB_URL      = process.env.DATABASE_URL || ''
 
-// Start Next.js server immediately
-require('./server.js')
+console.log('[startup] Starting Next.js server...')
 
-// Run schema push asynchronously in background
-const schemaPath = path.join(__dirname, 'prisma', 'schema.prisma')
-const dbUrl = process.env.DATABASE_URL || ''
+// Start server immediately — this keeps the process alive and opens port 3000
+const server = spawn('node', [SERVER_PATH], {
+  stdio: 'inherit',
+  env: process.env,
+})
 
-if (dbUrl) {
-  console.log('[startup] Starting background schema sync with PostgreSQL...')
-  const prismaCli = path.join(__dirname, 'node_modules', 'prisma', 'build', 'index.js')
+server.on('exit', (code) => {
+  console.log(`[startup] server.js exited with code ${code}`)
+  process.exit(code ?? 1)
+})
 
-  exec(
-    `node "${prismaCli}" db push --schema="${schemaPath}" --url="${dbUrl}" --accept-data-loss`,
-    { env: process.env },
-    (error, stdout, stderr) => {
-      if (error) {
-        console.error('[startup] Background schema sync error:', error.message)
-        if (stderr) console.error('[startup] Stderr:', stderr)
-      } else {
-        console.log('[startup] Background schema sync completed successfully ✓')
+// Push schema asynchronously in background after a brief delay
+if (DB_URL) {
+  setTimeout(() => {
+    console.log('[startup] Running background Prisma schema sync...')
+    exec(
+      `node "${PRISMA_CLI}" db push --schema="${SCHEMA_PATH}" --url="${DB_URL}" --accept-data-loss`,
+      { env: process.env },
+      (err, stdout, stderr) => {
+        if (err) {
+          console.error('[startup] Schema sync error:', err.message)
+          if (stderr) console.error('[startup]', stderr)
+        } else {
+          console.log('[startup] Schema sync complete ✓')
+          if (stdout) console.log('[startup]', stdout)
+        }
       }
-    }
-  )
+    )
+  }, 5000)
 } else {
-  console.warn('[startup] WARNING: DATABASE_URL not set!')
+  console.warn('[startup] DATABASE_URL not set — skipping schema sync')
 }
