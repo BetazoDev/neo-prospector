@@ -45,6 +45,5 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Run migrations then start server
-# DATABASE_URL is injected at runtime by Dokploy
-CMD ["sh", "-c", "npx prisma migrate deploy && node server.js"]
+# Sync schema directly with PostgreSQL database and start server
+CMD ["sh", "-c", "npx prisma db push && node server.js"]
