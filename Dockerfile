@@ -25,7 +25,4 @@ ENV HOSTNAME="0.0.0.0"
 
 EXPOSE 3000
 
-# Make entrypoint executable
-RUN chmod +x /app/docker-entrypoint.sh
-
-ENTRYPOINT ["/app/docker-entrypoint.sh"]
+CMD ["npx", "next", "start", "-H", "0.0.0.0", "-p", "3000"]

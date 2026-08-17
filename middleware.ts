@@ -41,13 +41,16 @@ export async function middleware(req: NextRequest) {
     }
 
     // Otherwise redirect to /login
-    const loginUrl = new URL('/login', req.url)
+    const loginUrl = req.nextUrl.clone()
+    loginUrl.pathname = '/login'
     return NextResponse.redirect(loginUrl)
   }
 
   // If authenticated user visits /login, redirect to /
   if (pathname === '/login' && isAuthenticated) {
-    return NextResponse.redirect(new URL('/', req.url))
+    const homeUrl = req.nextUrl.clone()
+    homeUrl.pathname = '/'
+    return NextResponse.redirect(homeUrl)
   }
 
   return NextResponse.next()
