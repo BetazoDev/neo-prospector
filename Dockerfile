@@ -1,23 +1,22 @@
-FROM node:20-alpine AS base
+FROM node:22-alpine AS base
 
-# Install dependencies
+# Install system deps
 FROM base AS deps
 RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
-# Use npm install to ensure Linux swc/native dependencies are resolved
 RUN npm install
 
-# Rebuild the source code
+# Build
 FROM base AS builder
 RUN apk add --no-cache openssl
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Set dummy DATABASE_URL for build phase prisma generate
-ENV DATABASE_URL="file:./prisma/dev.db"
+# Dummy URL for prisma generate only (no DB connection needed at build time)
+ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
 RUN npx prisma generate
 RUN npm run build
 
@@ -35,18 +34,17 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/prisma.config.ts ./
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
-
-# Create data directory for SQLite database
-RUN mkdir -p /app/data && chown -R nextjs:nodejs /app/data /app/prisma
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 
 USER nextjs
 
 EXPOSE 3000
-
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Sync schema with SQLite database and start server
-CMD ["sh", "-c", "npx prisma db push && node server.js"]
+# Run migrations then start server
+# DATABASE_URL is injected at runtime by Dokploy
+CMD ["sh", "-c", "npx prisma migrate deploy && node server.js"]

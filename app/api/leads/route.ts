@@ -1,7 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { getTokenFromRequest, verifyToken } from '@/lib/auth'
+
+async function getUserId(req: NextRequest): Promise<string | null> {
+  const token = getTokenFromRequest(req)
+  if (!token) return null
+  const payload = await verifyToken(token)
+  return payload?.userId ?? null
+}
 
 export async function GET(req: NextRequest) {
+  const userId = await getUserId(req)
+  if (!userId) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+
   const { searchParams } = new URL(req.url)
   const sort = searchParams.get('sort') ?? 'newest'
   const search = searchParams.get('search') ?? ''
@@ -10,19 +21,22 @@ export async function GET(req: NextRequest) {
   const page = parseInt(searchParams.get('page') ?? '1')
   const limit = parseInt(searchParams.get('limit') ?? '100')
 
-  const where: Record<string, unknown> = {}
+  // Always scope to this user
+  const where: Record<string, unknown> = { userId }
 
   if (jobId && jobId !== 'all') {
     where.jobId = parseInt(jobId)
   }
 
   if (search) {
+    // PostgreSQL: use 'contains' with mode: 'insensitive' for case-insensitive search
     where.OR = [
-      { title: { contains: search } },
-      { city: { contains: search } },
-      { category: { contains: search } },
+      { title: { contains: search, mode: 'insensitive' } },
+      { city: { contains: search, mode: 'insensitive' } },
+      { category: { contains: search, mode: 'insensitive' } },
     ]
   }
+
   if (withPhone) {
     where.phone = { not: null }
   }
@@ -46,13 +60,13 @@ export async function GET(req: NextRequest) {
     prisma.lead.count({ where }),
   ])
 
-  // Stats for the active scope
   const stats = await prisma.lead.aggregate({
     where,
     _count: { id: true },
     _avg: { rating: true },
     _sum: { reviewsCount: true },
   })
+
   const withPhoneCount = await prisma.lead.count({
     where: { ...where, phone: { not: null } },
   })
@@ -72,9 +86,17 @@ export async function GET(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  const userId = await getUserId(req)
+  if (!userId) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+
   const { searchParams } = new URL(req.url)
   const id = searchParams.get('id')
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
+
+  // Verify ownership before delete
+  const lead = await prisma.lead.findFirst({ where: { id: parseInt(id), userId } })
+  if (!lead) return NextResponse.json({ error: 'No encontrado' }, { status: 404 })
+
   await prisma.lead.delete({ where: { id: parseInt(id) } })
   return NextResponse.json({ success: true })
 }

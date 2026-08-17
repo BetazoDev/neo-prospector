@@ -5,71 +5,86 @@ import { getTokenFromRequest, verifyToken } from '@/lib/auth'
 
 export async function POST(req: NextRequest) {
   try {
+    const token = getTokenFromRequest(req)
+    if (!token) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+
+    const payload = await verifyToken(token)
+    if (!payload?.userId) return NextResponse.json({ error: 'Sesión inválida' }, { status: 401 })
+
+    const userId = payload.userId
+
     const { niche, zone, maxLeads, apiKey } = await req.json()
     if (!niche || !zone) {
       return NextResponse.json({ error: 'Nicho y zona son requeridos' }, { status: 400 })
     }
 
+    // Resolve API key: request body → user DB record → env var
     let effectiveKey = typeof apiKey === 'string' && apiKey.trim() ? apiKey.trim() : ''
 
-    // If apiKey is missing or empty, fetch from authenticated user session in DB
     if (!effectiveKey) {
-      const token = getTokenFromRequest(req)
-      if (token) {
-        const payload = await verifyToken(token)
-        if (payload?.userId) {
-          const user = await prisma.user.findUnique({
-            where: { id: payload.userId },
-            select: { apifyApiKey: true },
-          })
-          if (user?.apifyApiKey) {
-            effectiveKey = user.apifyApiKey
-          }
-        }
-      }
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { apifyApiKey: true },
+      })
+      if (user?.apifyApiKey) effectiveKey = user.apifyApiKey
     }
 
-    // Secondary fallback to environment variable
-    if (!effectiveKey) {
-      effectiveKey = process.env.APIFY_API_KEY || ''
-    }
+    if (!effectiveKey) effectiveKey = process.env.APIFY_API_KEY || ''
 
     if (!effectiveKey) {
       return NextResponse.json(
-        { error: 'Se requiere una API Key de Apify para continuar. Por favor ingresa tu API Key en la sección de Configuración.' },
+        { error: 'Se requiere una API Key de Apify. Configúrala en Ajustes.' },
         { status: 400 }
       )
     }
 
     const parsedMaxLeads = typeof maxLeads === 'number' && maxLeads > 0 ? maxLeads : 100
 
-    // Create job record
+    // Generate icon (2 first letters of niche, uppercased)
+    const icon = niche
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((w: string) => w[0]?.toUpperCase() ?? '')
+      .join('')
+      .slice(0, 2) || 'NP'
+
+    // Pick a consistent color based on niche string hash
+    const PALETTE = ['#7c3aed', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#8b5cf6', '#06b6d4']
+    const colorIdx = niche.split('').reduce((acc: number, c: string) => acc + c.charCodeAt(0), 0) % PALETTE.length
+    const color = PALETTE[colorIdx]
+
+    // Create job record with userId + display fields
     const job = await prisma.scrapingJob.create({
-      data: { niche, zone, status: 'running' },
+      data: {
+        userId,
+        niche,
+        zone,
+        status: 'running',
+        name: `${niche} · ${zone}`,
+        icon,
+        color,
+      },
     })
 
     try {
-      // 1. Geocode the zone
       const { lat, lon, countryCode } = await geocodeZone(zone)
-
-      // 2. Launch Apify actor with user's custom maxLeads and key
       const runId = await launchApifyScrape(niche, zone, lat, lon, parsedMaxLeads, effectiveKey)
+
       await prisma.scrapingJob.update({
         where: { id: job.id },
         data: { apifyRunId: runId },
       })
 
-      // 3. Poll for completion
       const datasetId = await pollApifyRun(runId, effectiveKey)
-
-      // 4. Fetch and filter results
       const leads = await fetchApifyResults(datasetId, countryCode, effectiveKey)
 
-      // 5. Save to DB linked to job.id
       const created = await prisma.$transaction(
         leads.map((lead) =>
           prisma.lead.create({
             data: {
+              userId,
+              jobId: job.id,
               title: lead.title ?? 'Sin nombre',
               phone: lead.phone ?? null,
               rating: lead.totalScore ?? null,
@@ -82,24 +97,17 @@ export async function POST(req: NextRequest) {
               searchNiche: niche,
               searchZone: zone,
               countryCode,
-              jobId: job.id,
             },
           })
         )
       )
 
-      // Update job status
       await prisma.scrapingJob.update({
         where: { id: job.id },
         data: { status: 'done', leadsFound: created.length },
       })
 
-      return NextResponse.json({
-        success: true,
-        jobId: job.id,
-        count: created.length,
-        leads: created,
-      })
+      return NextResponse.json({ success: true, jobId: job.id, count: created.length })
     } catch (err) {
       await prisma.scrapingJob.update({
         where: { id: job.id },

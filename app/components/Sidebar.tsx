@@ -71,7 +71,7 @@ export default function Sidebar({
             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M2 4h12M2 8h12M2 12h8" strokeLinecap="round" />
             </svg>
-            Todos los Leads
+            Tus Bases
           </button>
 
           <div className="sidebar-section-label" style={{ marginTop: 20 }}>Herramientas</div>

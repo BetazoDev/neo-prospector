@@ -3,23 +3,50 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
+  id           String        @id @default(cuid())
+  email        String        @unique
   passwordHash String
   apifyApiKey  String?
-  maxLeads     Int      @default(100)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  maxLeads     Int           @default(100)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  jobs         ScrapingJob[]
 
   @@map("users")
 }
 
+model ScrapingJob {
+  id         Int      @id @default(autoincrement())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Nombre editable de la base (por defecto: "Niche · Zone")
+  name       String?
+  /// Iniciales para el avatar de la card (2 chars)
+  icon       String?  @default("NP")
+  /// Color hex del avatar
+  color      String?  @default("#7c3aed")
+  niche      String
+  zone       String
+  status     String   @default("pending") // pending | running | done | error
+  leadsFound Int      @default(0)
+  apifyRunId String?
+  error      String?
+  leads      Lead[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("scraping_jobs")
+}
+
 model Lead {
   id           Int          @id @default(autoincrement())
+  userId       String
+  jobId        Int
+  job          ScrapingJob  @relation(fields: [jobId], references: [id], onDelete: Cascade)
   title        String
   phone        String?
   rating       Float?
@@ -32,24 +59,7 @@ model Lead {
   searchNiche  String?
   searchZone   String?
   countryCode  String?
-  jobId        Int?
-  job          ScrapingJob? @relation(fields: [jobId], references: [id], onDelete: Cascade)
   createdAt    DateTime     @default(now())
 
   @@map("leads")
-}
-
-model ScrapingJob {
-  id         Int      @id @default(autoincrement())
-  niche      String
-  zone       String
-  status     String   @default("pending") // pending | running | done | error
-  leadsFound Int      @default(0)
-  apifyRunId String?
-  error      String?
-  leads      Lead[]
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  @@map("scraping_jobs")
 }

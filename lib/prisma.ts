@@ -1,27 +1,16 @@
 import { PrismaClient } from '@prisma/client'
-import { PrismaLibSql } from '@prisma/adapter-libsql'
-import path from 'path'
+import { PrismaPg } from '@prisma/adapter-pg'
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-function getFormattedUrl(rawUrl: string): string {
-  if (rawUrl.startsWith('file:')) {
-    const cleanPath = rawUrl.replace(/^file:/, '').replace(/^\.\//, '')
-    const absolutePath = path.isAbsolute(cleanPath)
-      ? cleanPath
-      : path.join(process.cwd(), /*turbopackIgnore: true*/ cleanPath)
-    const normalizedPath = absolutePath.replace(/\\/g, '/')
-    return `file:${normalizedPath}`
-  }
-  return rawUrl
-}
-
 function createPrismaClient() {
-  const rawUrl = process.env.DATABASE_URL ?? 'file:./prisma/dev.db'
-  const url = getFormattedUrl(rawUrl)
-  const adapter = new PrismaLibSql({ url })
+  const connectionString =
+    process.env.DATABASE_URL ||
+    'postgresql://postgres:postgres@localhost:5432/neoprospector?schema=public'
+
+  const adapter = new PrismaPg({ connectionString })
   return new PrismaClient({ adapter })
 }
 

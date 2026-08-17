@@ -5,26 +5,8 @@ import { useRouter } from 'next/navigation'
 import Sidebar, { NavItem } from './components/Sidebar'
 import StatsPanel from './components/StatsPanel'
 import AIAgentForm from './components/AIAgentForm'
-import SearchTabs, { JobTab } from './components/SearchTabs'
-import FilterBar from './components/FilterBar'
-import LeadsTable from './components/LeadsTable'
+import BasesGrid, { JobBase } from './components/BasesGrid'
 import SettingsModal from './components/SettingsModal'
-
-interface Lead {
-  id: number
-  title: string
-  phone: string | null
-  rating: number | null
-  reviewsCount: number | null
-  category: string | null
-  address: string | null
-  city: string | null
-  website: string | null
-  mapsUrl: string | null
-  searchNiche: string | null
-  searchZone: string | null
-  createdAt: string
-}
 
 interface Stats {
   total: number
@@ -33,38 +15,17 @@ interface Stats {
   totalReviews: number | null
 }
 
-interface ApiResponse {
-  leads: Lead[]
-  total: number
-  page: number
-  pages: number
-  stats: Stats
-}
-
 export default function DashboardPage() {
   const router = useRouter()
 
-  const [leads, setLeads] = useState<Lead[]>([])
+  const [jobs, setJobs] = useState<JobBase[]>([])
   const [stats, setStats] = useState<Stats>({ total: 0, withPhone: 0, avgRating: null, totalReviews: null })
   const [loading, setLoading] = useState(true)
-  const [total, setTotal] = useState(0)
-  const [page, setPage] = useState(1)
-  const [pages, setPages] = useState(1)
-
-  // Search Jobs / Airtable Tabs State
-  const [jobs, setJobs] = useState<JobTab[]>([])
-  const [activeJobId, setActiveJobId] = useState<number | 'all'>('all')
 
   // Navigation & Modals
   const [activeNav, setActiveNav] = useState<NavItem>('dashboard')
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-
-  // Filters
-  const [search, setSearch] = useState('')
-  const [sort, setSort] = useState('newest')
-  const [withPhone, setWithPhone] = useState(false)
-  const [view, setView] = useState<'table' | 'grid'>('table')
 
   // Toast
   const [toast, setToast] = useState<{ title: string; desc: string; type: 'success' | 'error' } | null>(null)
@@ -74,93 +35,77 @@ export default function DashboardPage() {
     setTimeout(() => setToast(null), 4000)
   }
 
-  // Fetch search jobs list
+  // Fetch jobs (bases)
   const fetchJobs = useCallback(async () => {
+    setLoading(true)
     try {
       const res = await fetch('/api/jobs')
+      if (res.status === 401) {
+        router.push('/login')
+        return
+      }
       if (res.ok) {
-        const data = await res.json()
+        const data: JobBase[] = await res.json()
         setJobs(data)
       }
     } catch (err) {
       console.error('Error fetching jobs:', err)
+    } finally {
+      setLoading(false)
+    }
+  }, [router])
+
+  // Fetch global stats
+  const fetchStats = useCallback(async () => {
+    try {
+      const res = await fetch('/api/leads?limit=1')
+      if (res.ok) {
+        const data = await res.json()
+        setStats(data.stats)
+      }
+    } catch (err) {
+      console.error('Error fetching stats:', err)
     }
   }, [])
 
-  // Fetch leads for selected tab
-  const fetchLeads = useCallback(
-    async (p = 1) => {
-      setLoading(true)
-      try {
-        const params = new URLSearchParams({
-          page: String(p),
-          sort,
-          search,
-          withPhone: String(withPhone),
-          jobId: String(activeJobId),
-          limit: '100',
-        })
-        const res = await fetch(`/api/leads?${params}`)
-        if (res.status === 401) {
-          router.push('/login')
-          return
-        }
-        const data: ApiResponse = await res.json()
-        setLeads(data.leads)
-        setStats(data.stats)
-        setTotal(data.total)
-        setPages(data.pages)
-        setPage(p)
-      } catch (err) {
-        console.error(err)
-      } finally {
-        setLoading(false)
-      }
-    },
-    [sort, search, withPhone, activeJobId, router]
-  )
-
   useEffect(() => {
     fetchJobs()
-  }, [fetchJobs])
-
-  // Debounced search & tab change trigger
-  useEffect(() => {
-    const timer = setTimeout(() => fetchLeads(1), 300)
-    return () => clearTimeout(timer)
-  }, [fetchLeads])
-
-  const handleDeleteLead = async (id: number) => {
-    try {
-      await fetch(`/api/leads?id=${id}`, { method: 'DELETE' })
-      showToast('Lead eliminado', 'El lead fue removido de la base de datos')
-      fetchLeads(page)
-      fetchJobs()
-    } catch {
-      showToast('Error', 'No se pudo eliminar el lead', 'error')
-    }
-  }
+    fetchStats()
+  }, [fetchJobs, fetchStats])
 
   const handleDeleteJob = async (jobId: number) => {
     try {
       const res = await fetch(`/api/jobs?id=${jobId}`, { method: 'DELETE' })
       if (res.ok) {
-        showToast('Búsqueda eliminada', 'Se removió la búsqueda y sus prospectos')
-        if (activeJobId === jobId) {
-          setActiveJobId('all')
-        }
+        showToast('Base eliminada', 'Se removió la base y todos sus prospectos')
         fetchJobs()
-        fetchLeads(1)
+        fetchStats()
       }
     } catch {
-      showToast('Error', 'No se pudo eliminar la búsqueda', 'error')
+      showToast('Error', 'No se pudo eliminar la base', 'error')
+    }
+  }
+
+  const handleRenameJob = async (jobId: number, newName: string) => {
+    try {
+      const res = await fetch(`/api/jobs?id=${jobId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newName }),
+      })
+      if (res.ok) {
+        showToast('Base renombrada', 'El nombre de la base ha sido actualizado')
+        fetchJobs()
+      }
+    } catch {
+      showToast('Error', 'No se pudo renombrar la base', 'error')
     }
   }
 
   const handleLeadsFound = () => {
-    showToast('¡Prospección completada!', 'Se encontraron nuevos leads. Actualizando pestañas y tabla...')
+    showToast('¡Prospección completada!', 'Se creó tu nueva base con los prospectos encontrados.')
     fetchJobs()
-    setTimeout(() => fetchLeads(1), 500)
+    fetchStats()
   }
 
   const handleLogout = async () => {
@@ -173,10 +118,8 @@ export default function DashboardPage() {
     }
   }
 
-  // Sidebar navigation handler
   const handleNavigate = (nav: NavItem) => {
     setActiveNav(nav)
-
     if (nav === 'dashboard') {
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } else if (nav === 'agent') {
@@ -185,55 +128,67 @@ export default function DashboardPage() {
       const input = document.getElementById('niche-input') as HTMLInputElement
       if (input) input.focus()
     } else if (nav === 'leads') {
-      const el = document.getElementById('leads-section')
+      const el = document.getElementById('bases-section')
       if (el) el.scrollIntoView({ behavior: 'smooth' })
     } else if (nav === 'settings') {
       setIsSettingsOpen(true)
     }
   }
 
-  // Export to CSV
-  const handleExportCSV = () => {
-    if (leads.length === 0) return
-    const headers = [
-      'ID',
-      'Empresa',
-      'Categoría',
-      'Teléfono',
-      'Rating',
-      'Reseñas',
-      'Ciudad',
-      'Dirección',
-      'Sitio Web',
-      'Google Maps',
-      'Nicho Búsqueda',
-      'Zona Búsqueda',
-    ]
-    const rows = leads.map((l) => [
-      l.id,
-      `"${l.title.replace(/"/g, '""')}"`,
-      `"${(l.category ?? '').replace(/"/g, '""')}"`,
-      `"${l.phone ?? ''}"`,
-      l.rating ?? '',
-      l.reviewsCount ?? '',
-      `"${(l.city ?? '').replace(/"/g, '""')}"`,
-      `"${(l.address ?? '').replace(/"/g, '""')}"`,
-      `"${l.website ?? ''}"`,
-      `"${l.mapsUrl ?? ''}"`,
-      `"${l.searchNiche ?? ''}"`,
-      `"${l.searchZone ?? ''}"`,
-    ])
+  const handleExportAllCSV = async () => {
+    try {
+      const res = await fetch('/api/leads?limit=10000')
+      if (!res.ok) return
+      const data = await res.json()
+      const leads = data.leads
 
-    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n')
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.setAttribute('download', `neo-prospector-leads-${new Date().toISOString().split('T')[0]}.csv`)
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    showToast('Exportación iniciada', 'Se descargó el archivo CSV con tus leads')
+      if (!leads || leads.length === 0) {
+        showToast('Sin leads', 'No hay prospectos para exportar', 'error')
+        return
+      }
+
+      const headers = [
+        'ID',
+        'Empresa',
+        'Categoría',
+        'Teléfono',
+        'Rating',
+        'Reseñas',
+        'Ciudad',
+        'Dirección',
+        'Sitio Web',
+        'Google Maps',
+        'Nicho',
+        'Zona',
+      ]
+      const rows = leads.map((l: any) => [
+        l.id,
+        `"${(l.title || '').replace(/"/g, '""')}"`,
+        `"${(l.category ?? '').replace(/"/g, '""')}"`,
+        `"${l.phone ?? ''}"`,
+        l.rating ?? '',
+        l.reviewsCount ?? '',
+        `"${(l.city ?? '').replace(/"/g, '""')}"`,
+        `"${(l.address ?? '').replace(/"/g, '""')}"`,
+        `"${l.website ?? ''}"`,
+        `"${l.mapsUrl ?? ''}"`,
+        `"${l.searchNiche ?? ''}"`,
+        `"${l.searchZone ?? ''}"`,
+      ])
+
+      const csvContent = [headers.join(','), ...rows.map((r: any) => r.join(','))].join('\n')
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', `neo-prospector-todos-los-leads-${new Date().toISOString().split('T')[0]}.csv`)
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      showToast('Exportación iniciada', 'Se descargaron todos los prospectos en CSV')
+    } catch {
+      showToast('Error', 'No se pudo exportar el CSV', 'error')
+    }
   }
 
   return (
@@ -246,7 +201,7 @@ export default function DashboardPage() {
       />
 
       <main className="main-content">
-        {/* Top bar */}
+        {/* Topbar */}
         <div className="topbar">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <button
@@ -260,7 +215,7 @@ export default function DashboardPage() {
             </button>
             <div className="topbar-title">
               <div className="topbar-accent-bar" />
-              Dashboard de Leads
+              Dashboard de Prospectos
             </div>
           </div>
 
@@ -272,7 +227,7 @@ export default function DashboardPage() {
               className="btn btn-ghost btn-sm"
               onClick={() => {
                 fetchJobs()
-                fetchLeads(page)
+                fetchStats()
               }}
               title="Actualizar"
             >
@@ -289,9 +244,6 @@ export default function DashboardPage() {
               style={{ color: '#ef4444' }}
             >
               <span className="desktop-only-hide">Cerrar Sesión</span>
-              <svg className="topbar-mobile-btn" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 13, height: 13, display: 'inline' }}>
-                <path d="M5 2H2v10h3M9 10l3-3-3-3M12 7H5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
             </button>
           </div>
         </div>
@@ -305,38 +257,12 @@ export default function DashboardPage() {
             <AIAgentForm onLeadsFound={handleLeadsFound} />
           </div>
 
-          {/* Search Tabs & Filter Bar & Leads Section */}
-          <div id="leads-section">
-            {/* Airtable-style Search Tabs */}
-            <SearchTabs
+          {/* Bases Grid (Airtable style) */}
+          <div id="bases-section">
+            <BasesGrid
               jobs={jobs}
-              activeJobId={activeJobId}
-              onSelectTab={(id) => setActiveJobId(id)}
               onDeleteJob={handleDeleteJob}
-              totalLeadsCount={stats.total}
-            />
-
-            <FilterBar
-              search={search}
-              onSearchChange={setSearch}
-              sort={sort}
-              onSortChange={setSort}
-              withPhone={withPhone}
-              onWithPhoneChange={setWithPhone}
-              view={view}
-              onViewChange={setView}
-              total={total}
-            />
-
-            {/* Leads */}
-            <LeadsTable
-              leads={leads}
-              view={view}
-              total={total}
-              page={page}
-              pages={pages}
-              onPageChange={fetchLeads}
-              onDelete={handleDeleteLead}
+              onRenameJob={handleRenameJob}
               loading={loading}
             />
           </div>
@@ -378,7 +304,7 @@ export default function DashboardPage() {
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
             <path d="M2 4h12M2 8h12M2 12h8" strokeLinecap="round" />
           </svg>
-          Leads
+          Bases
         </button>
 
         <button
@@ -402,7 +328,7 @@ export default function DashboardPage() {
           setActiveNav('dashboard')
         }}
         totalLeads={stats.total}
-        onExportCSV={handleExportCSV}
+        onExportCSV={handleExportAllCSV}
       />
 
       {/* Toast */}

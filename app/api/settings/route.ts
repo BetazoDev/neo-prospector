@@ -19,6 +19,11 @@ export async function GET(req: NextRequest) {
       select: { apifyApiKey: true, maxLeads: true },
     })
 
+    if (!user) {
+      // User ID from JWT token not found in current DB (e.g. after DB reset/migration)
+      return NextResponse.json({ error: 'Usuario no encontrado en la base de datos. Por favor vuelve a iniciar sesión.' }, { status: 401 })
+    }
+
     const effectiveKey = user?.apifyApiKey || process.env.APIFY_API_KEY || ''
     const maxLeads = user?.maxLeads || 100
 
@@ -29,7 +34,7 @@ export async function GET(req: NextRequest) {
     })
   } catch (error) {
     console.error('Error fetching settings:', error)
-    return NextResponse.json({ error: 'Error al obtener la configuración' }, { status: 500 })
+    return NextResponse.json({ error: `Error al obtener la configuración: ${String(error)}` }, { status: 500 })
   }
 }
 
@@ -57,6 +62,18 @@ export async function POST(req: NextRequest) {
     const cleanKey = apiKey.trim()
     const cleanMaxLeads = Math.max(1, Number(maxLeads) || 100)
 
+    // Check if user exists first
+    const existingUser = await prisma.user.findUnique({
+      where: { id: payload.userId },
+    })
+
+    if (!existingUser) {
+      return NextResponse.json(
+        { error: 'Tu sesión expiró o tu usuario no existe en esta base de datos. Por favor cierra sesión y vuelve a ingresar.' },
+        { status: 401 }
+      )
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id: payload.userId },
       data: {
@@ -77,6 +94,6 @@ export async function POST(req: NextRequest) {
     })
   } catch (error) {
     console.error('Error saving settings:', error)
-    return NextResponse.json({ error: 'Error al guardar la configuración' }, { status: 500 })
+    return NextResponse.json({ error: `Error al guardar la configuración: ${String(error)}` }, { status: 500 })
   }
 }
