@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start -H 0.0.0.0 -p 3000",
+    "start": "node startup.js",
     "lint": "eslint",
     "db:migrate": "npx prisma migrate deploy",
     "db:push": "npx prisma db push",
