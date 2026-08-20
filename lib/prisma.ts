@@ -1,16 +1,14 @@
 import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import { Pool } from 'pg'
+import { getDatabaseUrl } from './database'
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
 function createPrismaClient() {
-  const connectionString =
-    process.env.DATABASE_URL ||
-    'postgresql://postgres:postgres@localhost:5432/neoprospector?schema=public'
-
+  const connectionString = getDatabaseUrl()
   const pool = new Pool({ connectionString })
   const adapter = new PrismaPg(pool)
   return new PrismaClient({ adapter })
