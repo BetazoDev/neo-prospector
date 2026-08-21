@@ -25,10 +25,10 @@ if (!fs.existsSync(PRISMA_CLI)) {
   process.exit(1)
 }
 
-console.log('[startup] Pushing Prisma database schema...')
+console.log('[startup] Pushing Prisma database schema safely...')
 const pushSync = spawnSync(
   process.execPath,
-  [PRISMA_CLI, 'db', 'push', '--accept-data-loss'],
+  [PRISMA_CLI, 'db', 'push'],
   { stdio: 'inherit', cwd: ROOT, env }
 )
 
