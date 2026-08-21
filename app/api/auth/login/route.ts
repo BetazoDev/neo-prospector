@@ -63,8 +63,15 @@ export async function POST(req: NextRequest) {
     })
 
     return res
-  } catch (error) {
+  } catch (error: any) {
     console.error('Login error:', error)
-    return NextResponse.json({ error: 'Error interno de autenticación' }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: 'Error interno de autenticación',
+        details: error?.message || String(error),
+        stack: error?.stack,
+      },
+      { status: 500 }
+    )
   }
 }
