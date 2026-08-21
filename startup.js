@@ -9,7 +9,6 @@ const ROOT = __dirname
 const STANDALONE_SERVER_PATH = path.join(ROOT, '.next', 'standalone', 'server.js')
 const NEXT_CLI = path.join(ROOT, 'node_modules', 'next', 'dist', 'bin', 'next')
 const PRISMA_CLI = path.join(ROOT, 'node_modules', 'prisma', 'build', 'index.js')
-const SCHEMA_PATH = path.join(ROOT, 'prisma', 'schema.prisma')
 const PORT        = process.env.PORT || '3000'
 const HOSTNAME    = process.env.BIND_HOST || process.env.HOST || '0.0.0.0'
 const env         = { ...process.env, PORT, HOSTNAME }
@@ -29,7 +28,7 @@ if (!fs.existsSync(PRISMA_CLI)) {
 console.log('[startup] Applying Prisma migrations...')
 const migrateSync = spawnSync(
   process.execPath,
-  [PRISMA_CLI, 'migrate', 'deploy', `--schema=${SCHEMA_PATH}`],
+  [PRISMA_CLI, 'migrate', 'deploy'],
   { stdio: 'inherit', cwd: ROOT, env }
 )
 
