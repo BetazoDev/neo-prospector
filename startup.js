@@ -25,16 +25,15 @@ if (!fs.existsSync(PRISMA_CLI)) {
   process.exit(1)
 }
 
-console.log('[startup] Applying Prisma migrations...')
-const migrateSync = spawnSync(
+console.log('[startup] Pushing Prisma database schema...')
+const pushSync = spawnSync(
   process.execPath,
-  [PRISMA_CLI, 'migrate', 'deploy'],
+  [PRISMA_CLI, 'db', 'push', '--accept-data-loss'],
   { stdio: 'inherit', cwd: ROOT, env }
 )
 
-if (migrateSync.error || migrateSync.status !== 0) {
-  console.error('[startup] Database migration failed. Startup stopped.')
-  process.exit(migrateSync.status ?? 1)
+if (pushSync.error || pushSync.status !== 0) {
+  console.error('[startup] Database schema push failed:', pushSync.error || pushSync.status)
 }
 
 const serverArgs = useStandalone
