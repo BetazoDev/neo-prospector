@@ -7,6 +7,7 @@ import StatsPanel from './components/StatsPanel'
 import AIAgentForm from './components/AIAgentForm'
 import BasesGrid, { JobBase } from './components/BasesGrid'
 import SettingsModal from './components/SettingsModal'
+import ImportCSVModal from './components/ImportCSVModal'
 
 interface Stats {
   total: number
@@ -25,6 +26,7 @@ export default function DashboardPage() {
   // Navigation & Modals
   const [activeNav, setActiveNav] = useState<NavItem>('dashboard')
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [isImportOpen, setIsImportOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   // Toast
@@ -104,6 +106,12 @@ export default function DashboardPage() {
 
   const handleLeadsFound = () => {
     showToast('¡Prospección completada!', 'Se creó tu nueva base con los prospectos encontrados.')
+    fetchJobs()
+    fetchStats()
+  }
+
+  const handleCSVImported = () => {
+    showToast('¡CSV importado!', 'Se creó una nueva base con los leads del archivo CSV.')
     fetchJobs()
     fetchStats()
   }
@@ -225,6 +233,18 @@ export default function DashboardPage() {
             </span>
             <button
               className="btn btn-ghost btn-sm"
+              onClick={() => setIsImportOpen(true)}
+              title="Importar CSV"
+              id="import-csv-btn"
+            >
+              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 13, height: 13 }}>
+                <path d="M7 1v8M4 6l3 3 3-3" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M1 11h12" strokeLinecap="round" />
+              </svg>
+              <span className="desktop-only-hide">Importar CSV</span>
+            </button>
+            <button
+              className="btn btn-ghost btn-sm"
               onClick={() => {
                 fetchJobs()
                 fetchStats()
@@ -329,6 +349,13 @@ export default function DashboardPage() {
         }}
         totalLeads={stats.total}
         onExportCSV={handleExportAllCSV}
+      />
+
+      {/* Import CSV Modal */}
+      <ImportCSVModal
+        isOpen={isImportOpen}
+        onClose={() => setIsImportOpen(false)}
+        onImported={handleCSVImported}
       />
 
       {/* Toast */}
