@@ -16,6 +16,7 @@ ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
 RUN npx prisma generate
 
 # Build Next.js
+ENV NODE_OPTIONS="--max-old-space-size=1024"
 RUN npm run build
 
 # Runtime env
