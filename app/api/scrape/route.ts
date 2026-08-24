@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { geocodeZone, launchApifyScrape, pollApifyRun, fetchApifyResults } from '@/lib/apify'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
+import { ensureAdminUser } from '@/lib/seed-admin'
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,6 +13,9 @@ export async function POST(req: NextRequest) {
     if (!payload?.userId) return NextResponse.json({ error: 'Sesión inválida' }, { status: 401 })
 
     const userId = payload.userId
+
+    // Guarantee user exists in DB (prevents FK errors after VPS restart)
+    await ensureAdminUser()
 
     const { niche, zone, maxLeads, apiKey } = await req.json()
     if (!niche || !zone) {

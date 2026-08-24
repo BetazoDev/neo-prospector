@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
+import { ensureAdminUser } from '@/lib/seed-admin'
 import Papa from 'papaparse'
 
 async function getUserId(req: NextRequest): Promise<string | null> {
@@ -43,6 +44,18 @@ export async function POST(req: NextRequest) {
   try {
     const userId = await getUserId(req)
     if (!userId) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+
+    // Guarantee the user exists in DB — prevents FK constraint errors after VPS restart
+    await ensureAdminUser()
+
+    // Verify the user actually exists in DB (it should now after ensureAdminUser)
+    const userExists = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } })
+    if (!userExists) {
+      return NextResponse.json(
+        { error: 'Tu sesión expiró tras un reinicio del servidor. Por favor cierra sesión y vuelve a iniciar.' },
+        { status: 401 }
+      )
+    }
 
     const formData = await req.formData()
     const file = formData.get('file') as File | null
