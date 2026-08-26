@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
-import { ensureAdminUser } from '@/lib/seed-admin'
 import Papa from 'papaparse'
 
 async function getUserId(req: NextRequest): Promise<string | null> {
@@ -45,10 +44,7 @@ export async function POST(req: NextRequest) {
     const userId = await getUserId(req)
     if (!userId) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
 
-    // Guarantee the user exists in DB — prevents FK constraint errors after VPS restart
-    await ensureAdminUser()
-
-    // Verify the user actually exists in DB (it should now after ensureAdminUser)
+    // A session can outlive a user record that was removed externally.
     const userExists = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } })
     if (!userExists) {
       return NextResponse.json(

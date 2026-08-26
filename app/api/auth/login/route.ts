@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { comparePassword, signToken } from '@/lib/auth'
 import { checkRateLimit } from '@/lib/rate-limit'
-import { ensureAdminUser } from '@/lib/seed-admin'
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,9 +19,6 @@ export async function POST(req: NextRequest) {
         { status: 429 }
       )
     }
-
-    // Ensure initial admin user exists
-    await ensureAdminUser()
 
     const { email, password } = await req.json()
 

@@ -11,8 +11,8 @@
     "start": "node startup.js",
     "lint": "eslint",
     "db:migrate": "npx prisma migrate deploy",
-    "db:push": "npx prisma db push",
-    "db:seed": "npx tsx lib/seed-admin.ts"
+    "db:check": "node scripts/check-database.js",
+    "db:bootstrap-admin": "npx tsx scripts/bootstrap-admin.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",
