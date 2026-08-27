@@ -42,17 +42,14 @@ runRequiredStep('Validating PostgreSQL target', [DATABASE_CHECK])
 runRequiredStep('Applying Prisma migrations', [PRISMA_CLI, 'migrate', 'deploy'])
 runRequiredStep('Verifying migrated PostgreSQL schema', [DATABASE_CHECK, '--require-schema'])
 
-// This is idempotent: it only creates the configured administrator when the
-// record is missing, and never changes an existing password or application data.
-// A fresh persistent database is usable immediately after its first deployment.
-if (env.ADMIN_EMAIL && env.ADMIN_PASSWORD) {
-  runRequiredStep('Ensuring configured administrator exists', [
-    path.join(ROOT, 'node_modules', 'tsx', 'dist', 'cli.mjs'),
-    BOOTSTRAP_ADMIN,
-  ])
-} else {
-  console.warn('[startup] ADMIN_EMAIL and ADMIN_PASSWORD are not set; skipping administrator bootstrap.')
-}
+// This is idempotent: it only creates the administrator when the record is
+// missing, and never changes an existing password or application data.
+// Dokploy runtime variables take precedence; the legacy recovery values keep
+// a fresh persistent database usable even if Dokploy misses its env file.
+runRequiredStep('Ensuring administrator exists', [
+  path.join(ROOT, 'node_modules', 'tsx', 'dist', 'cli.mjs'),
+  BOOTSTRAP_ADMIN,
+])
 
 const serverArgs = useStandalone
   ? [STANDALONE_SERVER_PATH]

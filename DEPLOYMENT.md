@@ -10,7 +10,7 @@ No agregue `.env` ni `.env.local` a la imagen. El contexto Docker los excluye de
 
 En producción el arranque verifica que la URL no apunte a `localhost`, que coincida con `DATABASE_EXPECTED_HOST`, que PostgreSQL responda, y ejecuta únicamente `prisma migrate deploy`. Si cualquiera de esos pasos falla, la aplicación no inicia.
 
-Si se configuran `ADMIN_EMAIL` y `ADMIN_PASSWORD`, cada arranque verifica de forma idempotente que ese administrador exista. No cambia un administrador existente ni los demás datos. Si estas variables no están configuradas, el arranque lo informa y puede crearse de forma manual con `npm run db:bootstrap-admin`.
+`ADMIN_EMAIL` y `ADMIN_PASSWORD` definen las credenciales iniciales. El arranque verifica de forma idempotente que ese administrador exista y no cambia un administrador existente ni los demás datos. Para mantener la recuperación compatible con el despliegue original, si Dokploy no inyecta esas variables se usa el administrador predeterminado histórico.
 
 Para una comprobación de solo lectura de la conexión y los conteos actuales:
 
