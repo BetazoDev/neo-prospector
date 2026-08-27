@@ -11,6 +11,7 @@ const STANDALONE_SERVER_PATH = path.join(ROOT, '.next', 'standalone', 'server.js
 const NEXT_CLI = path.join(ROOT, 'node_modules', 'next', 'dist', 'bin', 'next')
 const PRISMA_CLI = path.join(ROOT, 'node_modules', 'prisma', 'build', 'index.js')
 const DATABASE_CHECK = path.join(ROOT, 'scripts', 'check-database.js')
+const BOOTSTRAP_ADMIN = path.join(ROOT, 'scripts', 'bootstrap-admin.ts')
 const PORT     = process.env.PORT || '3000'
 const HOSTNAME = process.env.BIND_HOST || process.env.HOST || '0.0.0.0'
 const env      = { ...process.env, PORT, HOSTNAME }
@@ -40,6 +41,18 @@ function runRequiredStep(label, args) {
 runRequiredStep('Validating PostgreSQL target', [DATABASE_CHECK])
 runRequiredStep('Applying Prisma migrations', [PRISMA_CLI, 'migrate', 'deploy'])
 runRequiredStep('Verifying migrated PostgreSQL schema', [DATABASE_CHECK, '--require-schema'])
+
+// This is idempotent: it only creates the configured administrator when the
+// record is missing, and never changes an existing password or application data.
+// A fresh persistent database is usable immediately after its first deployment.
+if (env.ADMIN_EMAIL && env.ADMIN_PASSWORD) {
+  runRequiredStep('Ensuring configured administrator exists', [
+    path.join(ROOT, 'node_modules', 'tsx', 'dist', 'cli.mjs'),
+    BOOTSTRAP_ADMIN,
+  ])
+} else {
+  console.warn('[startup] ADMIN_EMAIL and ADMIN_PASSWORD are not set; skipping administrator bootstrap.')
+}
 
 const serverArgs = useStandalone
   ? [STANDALONE_SERVER_PATH]

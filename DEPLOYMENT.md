@@ -10,13 +10,7 @@ No agregue `.env` ni `.env.local` a la imagen. El contexto Docker los excluye de
 
 En producción el arranque verifica que la URL no apunte a `localhost`, que coincida con `DATABASE_EXPECTED_HOST`, que PostgreSQL responda, y ejecuta únicamente `prisma migrate deploy`. Si cualquiera de esos pasos falla, la aplicación no inicia.
 
-Después del primer despliegue de una base nueva, ejecute una sola vez en la consola del contenedor:
-
-```bash
-npm run db:bootstrap-admin
-```
-
-El comando no crea tablas y no cambia un administrador existente. Las tablas pertenecen exclusivamente a las migraciones Prisma.
+Si se configuran `ADMIN_EMAIL` y `ADMIN_PASSWORD`, cada arranque verifica de forma idempotente que ese administrador exista. No cambia un administrador existente ni los demás datos. Si estas variables no están configuradas, el arranque lo informa y puede crearse de forma manual con `npm run db:bootstrap-admin`.
 
 Para una comprobación de solo lectura de la conexión y los conteos actuales:
 
