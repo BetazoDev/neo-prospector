@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface LogLine {
   text: string
@@ -9,17 +9,47 @@ interface LogLine {
 
 interface AIAgentFormProps {
   onLeadsFound: () => void
+  /** Se dispara en cuanto la base existe, para que el listado muestre "Extrayendo". */
+  onJobStarted?: () => void
 }
 
-export default function AIAgentForm({ onLeadsFound }: AIAgentFormProps) {
+/** Cada cuánto le preguntamos al servidor por el estado real de la corrida. */
+const POLL_INTERVAL_MS = 5000
+/** A partir de aquí dejamos de vigilar; la base se sigue recuperando sola en el servidor. */
+const MAX_WATCH_MS = 20 * 60 * 1000
+
+function formatElapsed(ms: number): string {
+  const total = Math.floor(ms / 1000)
+  const minutes = Math.floor(total / 60)
+  const seconds = total % 60
+  if (minutes === 0) return `${seconds}s`
+  return `${minutes}m ${String(seconds).padStart(2, '0')}s`
+}
+
+export default function AIAgentForm({ onLeadsFound, onJobStarted }: AIAgentFormProps) {
   const [niche, setNiche] = useState('')
   const [zone, setZone] = useState('')
   const [loading, setLoading] = useState(false)
   const [logs, setLogs] = useState<LogLine[]>([])
 
+  // Deja de sondear si el componente se desmonta a mitad de una búsqueda.
+  const activeRef = useRef(true)
+  useEffect(() => {
+    activeRef.current = true
+    return () => {
+      activeRef.current = false
+    }
+  }, [])
+
   const addLog = (text: string, status: LogLine['status'] = 'running') => {
     setLogs((prev) => [...prev, { text, status }])
   }
+
+  const replaceLastLog = (text: string, status: LogLine['status'] = 'running') => {
+    setLogs((prev) => (prev.length === 0 ? [{ text, status }] : [...prev.slice(0, -1), { text, status }]))
+  }
+
+  const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,68 +57,79 @@ export default function AIAgentForm({ onLeadsFound }: AIAgentFormProps) {
 
     setLoading(true)
     setLogs([])
+    addLog(`Lanzando búsqueda de "${niche.trim()}" en "${zone.trim()}"...`)
 
-    // Read stored settings from server DB session or localStorage
-    let maxLeads = 100
-    let apiKey = ''
+    let jobId: number
     try {
-      const settingsRes = await fetch('/api/settings')
-      if (settingsRes.ok) {
-        const settingsData = await settingsRes.json()
-        if (settingsData.apiKey) apiKey = settingsData.apiKey
-        if (settingsData.maxLeads) maxLeads = Number(settingsData.maxLeads)
-      }
-    } catch {
-      // ignore
-    }
-
-    if (!apiKey) {
-      try {
-        const savedSettings = localStorage.getItem('neoprospector_settings')
-        if (savedSettings) {
-          const parsed = JSON.parse(savedSettings)
-          if (parsed.maxLeads) maxLeads = Number(parsed.maxLeads)
-          if (parsed.apiKey) apiKey = parsed.apiKey.trim()
-        }
-      } catch {
-        // fallback
-      }
-    }
-
-    addLog(`Iniciando búsqueda: "${niche}" en "${zone}" (Límite: ${maxLeads} prospectos)...`)
-
-    try {
-      addLog('Geocodificando zona con OpenStreetMap...')
-
       const res = await fetch('/api/scrape', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          niche: niche.trim(),
-          zone: zone.trim(),
-          maxLeads,
-          apiKey,
-        }),
+        body: JSON.stringify({ niche: niche.trim(), zone: zone.trim() }),
       })
 
-      const data = await res.json()
+      const data = await res.json().catch(() => ({}))
 
       if (!res.ok) {
-        addLog(`Error: ${data.error}`, 'error')
+        replaceLastLog(data.error ?? `No se pudo lanzar la búsqueda (HTTP ${res.status})`, 'error')
         setLoading(false)
         return
       }
 
-      addLog('Lanzando actor de Apify en Google Maps...')
-      addLog('Esperando resultados de Google Maps...')
-      addLog('Filtrando por zona geográfica...')
-      addLog(`✓ ${data.count} leads encontrados y guardados`, 'done')
-
-      onLeadsFound()
+      jobId = data.jobId
+      const zoneNote = data.countryCode ? `zona acotada a "${zone.trim()}" (${data.countryCode})` : `zona "${zone.trim()}"`
+      replaceLastLog(`Corrida lanzada en Apify · ${zoneNote} · hasta ${data.maxLeads} lugares`, 'done')
+      onJobStarted?.()
     } catch (err) {
-      addLog(`Error de conexión: ${String(err)}`, 'error')
-    } finally {
+      replaceLastLog(`Error de conexión: ${String(err)}`, 'error')
       setLoading(false)
+      return
+    }
+
+    addLog('Extrayendo de Google Maps... 0s')
+
+    const startedAt = Date.now()
+
+    try {
+      while (activeRef.current && Date.now() - startedAt < MAX_WATCH_MS) {
+        await wait(POLL_INTERVAL_MS)
+        if (!activeRef.current) return
+
+        const res = await fetch(`/api/jobs/${jobId}/sync`, { method: 'POST' })
+        if (!res.ok) {
+          // Un fallo puntual de red no invalida la corrida: seguimos vigilando.
+          replaceLastLog(
+            `Extrayendo de Google Maps... ${formatElapsed(Date.now() - startedAt)} (sin respuesta del servidor)`
+          )
+          continue
+        }
+
+        const { outcome } = await res.json()
+
+        if (outcome.state === 'done') {
+          replaceLastLog(`✓ ${outcome.count} leads encontrados y guardados`, 'done')
+          onLeadsFound()
+          return
+        }
+
+        if (outcome.state === 'error') {
+          replaceLastLog(outcome.message ?? 'La búsqueda terminó con error', 'error')
+          return
+        }
+
+        const label = outcome.state === 'busy' ? 'Guardando resultados' : 'Extrayendo de Google Maps'
+        replaceLastLog(`${label}... ${formatElapsed(Date.now() - startedAt)}`)
+      }
+
+      if (activeRef.current) {
+        replaceLastLog(
+          'La búsqueda tarda más de lo habitual. Sigue corriendo en Apify y la base se completará sola: vuelve a este panel en unos minutos.',
+          'done'
+        )
+      }
+    } catch (err) {
+      if (activeRef.current) replaceLastLog(`Error de conexión: ${String(err)}`, 'error')
+    } finally {
+      if (activeRef.current) setLoading(false)
     }
   }
 
@@ -148,6 +189,7 @@ export default function AIAgentForm({ onLeadsFound }: AIAgentFormProps) {
             value={niche}
             onChange={(e) => setNiche(e.target.value)}
             disabled={loading}
+            maxLength={120}
             required
           />
         </div>
@@ -160,10 +202,11 @@ export default function AIAgentForm({ onLeadsFound }: AIAgentFormProps) {
             id="zone-input"
             type="text"
             className="form-input"
-            placeholder="ej. Madrid, España · Buenos Aires · CDMX"
+            placeholder="ej. Jalisco, México · Madrid, España · Buenos Aires"
             value={zone}
             onChange={(e) => setZone(e.target.value)}
             disabled={loading}
+            maxLength={120}
             required
           />
         </div>

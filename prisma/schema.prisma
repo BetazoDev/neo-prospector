@@ -40,9 +40,13 @@ model ScrapingJob {
   color      String?  @default("#7c3aed")
   niche      String
   zone       String
-  status     String   @default("pending") // pending | running | done | error
+  status     String   @default("pending") // pending | running | importing | done | error
   leadsFound Int      @default(0)
   apifyRunId String?
+  /// Dataset de la corrida, para poder recuperar los resultados más tarde.
+  apifyDatasetId String?
+  /// Secreto que autentica el webhook de Apify para esta base concreta.
+  webhookToken   String?
   error      String?
   leads      Lead[]
   createdAt  DateTime @default(now())

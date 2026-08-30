@@ -5,6 +5,11 @@ La aplicación no guarda la base de datos dentro de su contenedor. Configure est
 - `DATABASE_URL`: URL interna del servicio PostgreSQL de Dokploy.
 - `DATABASE_EXPECTED_HOST`: hostname interno de ese mismo servicio, sin puerto. Si no se define, la aplicación protege el hostname actual de Dokploy; configúralo si ese servicio cambia.
 - `JWT_SECRET`, `APIFY_API_KEY`, `ADMIN_EMAIL` y `ADMIN_PASSWORD`.
+- `APP_URL` (opcional): URL pública de la aplicación, por ejemplo
+  `https://prospector.diabolicalservices.tech`. Si está definida, cada búsqueda adjunta un
+  webhook y Apify avisa en cuanto termina, así que los leads aparecen de inmediato. Si no
+  lo está, las búsquedas terminadas se recuperan igual al abrir el panel, solo que con
+  algo de retraso.
 - `ALLOW_DATABASE_INITIALIZATION=false`: déjelo así en operación normal. Sólo se
   permite `true` en el único arranque que inicializa una base nueva de forma
   deliberada; elimínelo inmediatamente cuando el log confirme la inicialización.

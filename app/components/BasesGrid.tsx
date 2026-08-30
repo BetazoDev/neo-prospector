@@ -95,6 +95,15 @@ export default function BasesGrid({
       )
     }
 
+    if (status === 'importing') {
+      return (
+        <span className="base-status base-status-running">
+          <span className="base-status-dot" />
+          Guardando
+        </span>
+      )
+    }
+
     if (status === 'error') {
       return (
         <span className="base-status base-status-error">
