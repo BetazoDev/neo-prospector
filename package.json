@@ -12,6 +12,7 @@
     "lint": "eslint",
     "db:migrate": "npx prisma migrate deploy",
     "db:check": "node scripts/check-database.js",
+    "db:initialize": "node scripts/ensure-database-initialized.js",
     "db:bootstrap-admin": "npx tsx scripts/bootstrap-admin.ts"
   },
   "dependencies": {

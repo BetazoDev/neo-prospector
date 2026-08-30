@@ -66,19 +66,21 @@ async function main() {
 
     const tables = await client.query(
       "SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND tablename = ANY($1::text[]) ORDER BY tablename",
-      [['users', 'scraping_jobs', 'leads']]
+      [['users', 'scraping_jobs', 'leads', 'system_state']]
     )
     const foundTables = new Set(tables.rows.map((row) => row.tablename))
-    const requiredTables = ['users', 'scraping_jobs', 'leads']
+    const requiredTables = ['users', 'scraping_jobs', 'leads', 'system_state']
     const missingTables = requiredTables.filter((table) => !foundTables.has(table))
     if (missingTables.length > 0) fail(`Missing required tables after migration: ${missingTables.join(', ')}.`)
 
     const counts = await client.query(
       'SELECT (SELECT count(*) FROM "users") AS users, (SELECT count(*) FROM "scraping_jobs") AS jobs, (SELECT count(*) FROM "leads") AS leads'
     )
-    console.log(
-      `[database-check] PostgreSQL ${target.host}:${target.port}/${target.database}; users=${counts.rows[0].users}, jobs=${counts.rows[0].jobs}, leads=${counts.rows[0].leads}`
+    const initialization = await client.query(
+      "SELECT \"initializedAt\" FROM \"system_state\" WHERE \"key\" = 'primary'"
     )
+    const marker = initialization.rows[0]?.initializedAt
+    console.log(`[database-check] PostgreSQL ${target.host}:${target.port}/${target.database}; users=${counts.rows[0].users}, jobs=${counts.rows[0].jobs}, leads=${counts.rows[0].leads}, initialized=${marker ? 'yes' : 'no'}`)
   } finally {
     await client.end().catch(() => undefined)
   }
