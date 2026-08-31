@@ -274,7 +274,7 @@ export default function DashboardPage() {
 
           {/* AI Agent Form */}
           <div id="agent-section">
-            <AIAgentForm onLeadsFound={handleLeadsFound} />
+            <AIAgentForm onLeadsFound={handleLeadsFound} onJobStarted={fetchJobs} />
           </div>
 
           {/* Bases Grid (Airtable style) */}

@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { after, NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
+import { reconcileRunningJobs } from '@/lib/ingest'
 
 async function getUserId(req: NextRequest): Promise<string | null> {
   const token = getTokenFromRequest(req)
@@ -21,6 +22,17 @@ export async function GET(req: NextRequest) {
         _count: { select: { leads: true } },
       },
     })
+
+    // Recupera búsquedas que quedaron colgadas (navegador cerrado, webhook perdido)
+    // sin hacer esperar al dashboard. Aparecerán resueltas en la siguiente carga.
+    after(async () => {
+      try {
+        await reconcileRunningJobs(userId)
+      } catch (error) {
+        console.error('[jobs] background reconcile failed:', error)
+      }
+    })
+
     return NextResponse.json(jobs)
   } catch (error) {
     console.error('Error fetching jobs:', error)

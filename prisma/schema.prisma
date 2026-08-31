@@ -6,6 +6,14 @@ datasource db {
   provider = "postgresql"
 }
 
+/// Singleton marker that proves this database was intentionally initialized.
+/// The application refuses to start against a database without this record.
+model SystemState {
+  key           String   @id
+  initializedAt DateTime @default(now())
+
+  @@map("system_state")
+}
 
 model User {
   id           String        @id @default(cuid())
@@ -32,9 +40,13 @@ model ScrapingJob {
   color      String?  @default("#7c3aed")
   niche      String
   zone       String
-  status     String   @default("pending") // pending | running | done | error
+  status     String   @default("pending") // pending | running | importing | done | error
   leadsFound Int      @default(0)
   apifyRunId String?
+  /// Dataset de la corrida, para poder recuperar los resultados más tarde.
+  apifyDatasetId String?
+  /// Secreto que autentica el webhook de Apify para esta base concreta.
+  webhookToken   String?
   error      String?
   leads      Lead[]
   createdAt  DateTime @default(now())
