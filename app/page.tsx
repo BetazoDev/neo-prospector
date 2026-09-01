@@ -8,6 +8,7 @@ import AIAgentForm from './components/AIAgentForm'
 import BasesGrid, { JobBase } from './components/BasesGrid'
 import SettingsModal from './components/SettingsModal'
 import ImportCSVModal from './components/ImportCSVModal'
+import BottomNav from './components/BottomNav'
 
 interface Stats {
   total: number
@@ -261,8 +262,14 @@ export default function DashboardPage() {
               className="btn btn-ghost btn-sm"
               onClick={handleLogout}
               title="Cerrar Sesión"
+              aria-label="Cerrar Sesión"
               style={{ color: '#ef4444' }}
             >
+              {/* Con el rótulo oculto en móvil, sin icono el botón quedaba vacío. */}
+              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 13, height: 13 }}>
+                <path d="M5.5 12.5H2.5a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h3" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M9 9.5 12.5 7 9 4.5M12.5 7H5.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
               <span className="desktop-only-hide">Cerrar Sesión</span>
             </button>
           </div>
@@ -289,56 +296,7 @@ export default function DashboardPage() {
         </div>
       </main>
 
-      {/* Mobile Bottom Navigation Bar */}
-      <nav className="bottom-nav">
-        <button
-          type="button"
-          className={`bottom-nav-item ${activeNav === 'dashboard' ? 'active' : ''}`}
-          onClick={() => handleNavigate('dashboard')}
-        >
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <rect x="1" y="1" width="6" height="6" rx="1.5" />
-            <rect x="9" y="1" width="6" height="6" rx="1.5" />
-            <rect x="1" y="9" width="6" height="6" rx="1.5" />
-            <rect x="9" y="9" width="6" height="6" rx="1.5" />
-          </svg>
-          Inicio
-        </button>
-
-        <button
-          type="button"
-          className={`bottom-nav-item ${activeNav === 'agent' ? 'active' : ''}`}
-          onClick={() => handleNavigate('agent')}
-        >
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M8 2v12M2 8h12" strokeLinecap="round" />
-          </svg>
-          Prospectar
-        </button>
-
-        <button
-          type="button"
-          className={`bottom-nav-item ${activeNav === 'leads' ? 'active' : ''}`}
-          onClick={() => handleNavigate('leads')}
-        >
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <path d="M2 4h12M2 8h12M2 12h8" strokeLinecap="round" />
-          </svg>
-          Bases
-        </button>
-
-        <button
-          type="button"
-          className={`bottom-nav-item ${activeNav === 'settings' ? 'active' : ''}`}
-          onClick={() => handleNavigate('settings')}
-        >
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-            <circle cx="8" cy="8" r="3" />
-            <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" strokeLinecap="round" />
-          </svg>
-          Ajustes
-        </button>
-      </nav>
+      <BottomNav activeNav={activeNav} onNavigate={handleNavigate} />
 
       {/* Settings Modal */}
       <SettingsModal

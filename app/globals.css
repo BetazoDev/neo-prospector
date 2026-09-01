@@ -81,7 +81,6 @@ body {
   background-color: var(--bg-base);
   color: var(--text-primary);
   line-height: 1.5;
-  overflow-x: hidden;
 }
 
 /* ============ SCROLLBAR ============ */
@@ -1146,6 +1145,31 @@ tbody td {
 
   .topbar {
     padding: var(--space-3) var(--space-4);
+    gap: var(--space-2);
+  }
+
+  /* Sin min-width:0 el título no se encoge y empuja a los botones de acción
+     fuera de la pantalla, donde el overflow oculto del body los recorta. */
+  .topbar-title {
+    min-width: 0;
+    font-size: 15px;
+  }
+
+  .topbar-title > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .topbar-accent-bar {
+    flex: 0 0 3px;
+  }
+
+  /* Doce botones de paginación no entran en una fila de móvil. Sin envolver,
+     los últimos quedaban recortados y sin forma de llegar a ellos. */
+  .pagination {
+    flex-wrap: wrap;
+    padding: var(--space-4);
   }
 
   .topbar-mobile-btn {

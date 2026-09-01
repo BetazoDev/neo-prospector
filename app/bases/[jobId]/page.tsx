@@ -6,6 +6,8 @@ import Sidebar, { NavItem } from '../../components/Sidebar'
 import FilterBar from '../../components/FilterBar'
 import LeadsTable from '../../components/LeadsTable'
 import SettingsModal from '../../components/SettingsModal'
+import BottomNav from '../../components/BottomNav'
+import { useIsMobile } from '@/lib/use-is-mobile'
 
 interface Lead {
   id: number
@@ -61,10 +63,18 @@ export default function BaseDetailPage({ params }: PageProps) {
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState('newest')
   const [withPhone, setWithPhone] = useState(false)
-  const [view, setView] = useState<'table' | 'grid'>('table')
+
+  // La tabla tiene nueve columnas y en un móvil obliga a arrastrar en horizontal,
+  // así que ahí arrancamos en tarjetas. `null` significa "aún sin elegir": en
+  // cuanto el usuario toca el selector, su elección manda en cualquier tamaño.
+  const isMobile = useIsMobile()
+  const [viewChoice, setViewChoice] = useState<'table' | 'grid' | null>(null)
+  const view = viewChoice ?? (isMobile ? 'grid' : 'table')
 
   // Modals & Nav
-  const [activeNav, setActiveNav] = useState<NavItem>('leads')
+  // Esta pantalla vive siempre dentro de la sección de bases; el resto de destinos
+  // cambian de ruta, así que no hay estado que actualizar.
+  const activeNav: NavItem = 'leads'
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isEditingName, setIsEditingName] = useState(false)
@@ -224,6 +234,8 @@ export default function BaseDetailPage({ params }: PageProps) {
       setIsSettingsOpen(true)
     } else if (nav === 'agent') {
       router.push('/#agent-section')
+    } else if (nav === 'leads') {
+      router.push('/#bases-section')
     }
   }
 
@@ -284,10 +296,16 @@ export default function BaseDetailPage({ params }: PageProps) {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <button className="btn btn-ghost btn-sm" onClick={handleExportCSV} disabled={leads.length === 0}>
-              📥 CSV
+              📥 <span className="desktop-only-hide">CSV</span>
             </button>
-            <button className="btn btn-ghost btn-sm" onClick={handleDeleteBase} style={{ color: '#ef4444' }}>
-              🗑️ Eliminar Base
+            <button
+              className="btn btn-ghost btn-sm"
+              onClick={handleDeleteBase}
+              style={{ color: '#ef4444' }}
+              title="Eliminar base"
+              aria-label="Eliminar base"
+            >
+              🗑️ <span className="desktop-only-hide">Eliminar Base</span>
             </button>
           </div>
         </div>
@@ -333,7 +351,7 @@ export default function BaseDetailPage({ params }: PageProps) {
             withPhone={withPhone}
             onWithPhoneChange={setWithPhone}
             view={view}
-            onViewChange={setView}
+            onViewChange={setViewChoice}
             total={total}
           />
 
@@ -350,6 +368,8 @@ export default function BaseDetailPage({ params }: PageProps) {
           />
         </div>
       </main>
+
+      <BottomNav activeNav={activeNav} onNavigate={handleNavigate} />
 
       <SettingsModal
         isOpen={isSettingsOpen}
