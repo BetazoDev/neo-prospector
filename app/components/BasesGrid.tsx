@@ -709,11 +709,11 @@ export default function BasesGrid({
             width: 100%;
           }
 
-          /* Cuadrícula de dos por fila en móvil, en vez de una lista vertical. */
+          /* Una sola columna: a dos por fila la tarjeta se queda en 165px y el
+             contenido deja de leerse con comodidad. */
           .bases-grid,
           .bases-grid-skeleton {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: var(--space-3);
+            grid-template-columns: 1fr;
           }
 
           .base-card {
@@ -727,50 +727,7 @@ export default function BasesGrid({
           }
         }
 
-        /* Por debajo de 360px dos tarjetas ya no caben de forma legible. */
-        @media (max-width: 359px) {
-          .bases-grid,
-          .bases-grid-skeleton {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        /* Con dos tarjetas por fila en un móvil de 375px quedan unos 165px de
-           ancho útil por tarjeta. La columna lateral de acciones se llevaría 44
-           de esos 165, así que la tarjeta pasa a apilarse en vertical. */
         @media (max-width: 480px) {
-          .base-card {
-            flex-direction: column;
-            gap: var(--space-3);
-            padding: var(--space-3);
-            min-height: 0;
-          }
-
-          .base-card-main {
-            gap: var(--space-3);
-          }
-
-          .base-card-badge {
-            width: 32px;
-            height: 32px;
-            flex-basis: 32px;
-            font-size: 11px;
-          }
-
-          /* Dos líneas en lugar de una: recortado a una sola, un nombre como
-             "Clínicas Dentales · Jalisco" se quedaba en tres palabras. */
-          .base-card-title {
-            font-size: 13px;
-            white-space: normal;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-          }
-
-          .base-card-metric-value {
-            font-size: 20px;
-          }
-
           .base-card-footer {
             align-items: flex-start;
             flex-direction: column;
@@ -783,15 +740,6 @@ export default function BasesGrid({
             flex-wrap: wrap;
             /* max-content forzaba a la tarjeta a ensancharse y desbordar. */
             min-width: 0;
-          }
-
-          .base-card-actions {
-            flex-direction: row;
-            justify-content: flex-end;
-          }
-
-          .base-card-skeleton {
-            height: 210px;
           }
         }
       `}</style>

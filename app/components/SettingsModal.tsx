@@ -152,7 +152,7 @@ export default function SettingsModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <div className="modal-header" style={{ marginBottom: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div
               style={{
@@ -216,7 +216,7 @@ export default function SettingsModal({
 
           {/* API Key Field */}
           <div style={{ marginBottom: 16 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+            <div className="modal-row" style={{ marginBottom: 6 }}>
               <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)' }}>
                 Apify API Key (Token) <span style={{ color: '#fff' }}>* Requerido</span>
               </label>
@@ -225,14 +225,15 @@ export default function SettingsModal({
               </span>
             </div>
 
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div className="modal-key-row">
               <input
                 type={showKey ? 'text' : 'password'}
                 value={apiKeyInput}
                 onChange={(e) => setApiKeyInput(e.target.value)}
                 placeholder="ej. apify_api_bIBSldSBpL..."
+                /* El ancho lo decide .modal-key-row: en línea ganaría al CSS y
+                   dejaría el campo aplastado junto a los botones en móvil. */
                 style={{
-                  flex: 1,
                   background: 'var(--bg-surface)',
                   border: '1px solid var(--border-default)',
                   borderRadius: 'var(--radius-md)',
@@ -309,7 +310,7 @@ export default function SettingsModal({
             </div>
           )}
 
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 6 }}>
+          <div className="modal-row" style={{ paddingTop: 6 }}>
             <span style={{ fontSize: 12, color: '#fff', fontWeight: 600, opacity: saveSuccess ? 1 : 0, transition: 'opacity 0.2s' }}>
               ✓ ¡Ajustes guardados correctamente!
             </span>
@@ -323,14 +324,12 @@ export default function SettingsModal({
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
           {/* Apify status */}
           <div
+            className="modal-row"
             style={{
               background: 'var(--bg-elevated)',
               border: '1px solid var(--border-subtle)',
               borderRadius: 'var(--radius-md)',
               padding: '10px 14px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
             }}
           >
             <div>
@@ -348,35 +347,31 @@ export default function SettingsModal({
 
           {/* Database status */}
           <div
+            className="modal-row"
             style={{
               background: 'var(--bg-elevated)',
               border: '1px solid var(--border-subtle)',
               borderRadius: 'var(--radius-md)',
               padding: '10px 14px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
             }}
           >
             <div>
               <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>
                 Base de Datos
               </div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: '#fff', marginTop: 2 }}>SQLite Relacional · {totalLeads} Leads</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#fff', marginTop: 2 }}>PostgreSQL · {totalLeads} Leads</div>
             </div>
             <span className="badge badge-success">Activo</span>
           </div>
 
           {/* Dominio Productivo */}
           <div
+            className="modal-row"
             style={{
               background: 'var(--bg-elevated)',
               border: '1px solid var(--border-subtle)',
               borderRadius: 'var(--radius-md)',
               padding: '10px 14px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
             }}
           >
             <div>
@@ -390,7 +385,7 @@ export default function SettingsModal({
         </div>
 
         {/* Actions */}
-        <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
+        <div className="modal-actions">
           <button className="btn btn-ghost" onClick={onExportCSV} disabled={totalLeads === 0}>
             <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 14, height: 14 }}>
               <path d="M7 1v8M7 9l-3-3M7 9l3-3M1 11h12" strokeLinecap="round" strokeLinejoin="round" />

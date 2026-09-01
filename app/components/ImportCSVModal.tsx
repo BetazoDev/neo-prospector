@@ -140,7 +140,7 @@ export default function ImportCSVModal({ isOpen, onClose, onImported }: ImportCS
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <div className="modal-header" style={{ marginBottom: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div
               style={{
@@ -363,7 +363,7 @@ export default function ImportCSVModal({ isOpen, onClose, onImported }: ImportCS
         )}
 
         {/* Actions */}
-        <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
+        <div className="modal-actions">
           <button
             onClick={handleClose}
             disabled={loading}

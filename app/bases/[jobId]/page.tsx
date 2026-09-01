@@ -403,11 +403,18 @@ export default function BaseDetailPage({ params }: PageProps) {
           flex-wrap: wrap;
         }
 
+        /* Sin min-width:0 este bloque no se encoge y el nombre de la base se
+           sale de la tarjeta por la derecha. */
+        .base-header-main {
+          min-width: 0;
+        }
+
         .base-header-title {
           font-size: 20px;
           font-weight: 700;
           color: #ffffff;
           letter-spacing: -0.4px;
+          overflow-wrap: anywhere;
         }
 
         .base-header-meta {
@@ -438,6 +445,27 @@ export default function BaseDetailPage({ params }: PageProps) {
           color: var(--text-tertiary, #888888);
           text-transform: uppercase;
           letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 480px) {
+          .base-header-card {
+            padding: 16px;
+            gap: 14px;
+          }
+
+          .base-header-title {
+            font-size: 17px;
+          }
+
+          /* Tres métricas con 24px de separación no caben en un móvil. */
+          .base-header-stats {
+            gap: 16px;
+            flex-wrap: wrap;
+          }
+
+          .mini-stat {
+            align-items: flex-start;
+          }
         }
       `}</style>
     </>
