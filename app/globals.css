@@ -839,6 +839,10 @@ tbody td {
   gap: var(--space-2);
   font-size: 12px;
   color: var(--text-secondary);
+  /* Sin esto una dirección larga o una URL no se encogen, y como .lead-card
+     recorta el desbordamiento, el texto quedaba cortado a media palabra. */
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .card-detail-row svg {
@@ -865,6 +869,9 @@ tbody td {
 
 .card-wa-btn {
   flex: 1;
+  /* El rótulo es largo; sin poder encogerse empujaba fuera de la tarjeta a los
+     botones de mapa y borrar. */
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1083,6 +1090,83 @@ tbody td {
   display: none;
 }
 
+/* ============ MODALES ============ */
+/* Los modales se maquetan con estilos en línea y sus filas son flex con
+   space-between. Sin min-width:0 el contenido no se encoge, y sin envolver se
+   sale del ancho de un móvil: por eso los botones de la clave de Apify y las
+   etiquetas de estado quedaban fuera de la pantalla. */
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.modal-header > *:first-child {
+  min-width: 0;
+}
+
+.modal-header > button {
+  flex: 0 0 auto;
+}
+
+.modal-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.modal-row > * {
+  min-width: 0;
+}
+
+.modal-key-row {
+  display: flex;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.modal-key-row input {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.modal-actions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+  .modal-row {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  /* La clave ocupa la fila entera y los botones bajan debajo. */
+  .modal-key-row {
+    flex-wrap: wrap;
+  }
+
+  .modal-key-row input {
+    flex-basis: 100%;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .modal-actions > * {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 @media (max-width: 1024px) {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -1155,7 +1239,14 @@ tbody td {
     font-size: 15px;
   }
 
-  .topbar-title > span {
+  /* Descendiente, no hijo directo: en la página de una base el título va
+     envuelto en un div junto al botón de editar, así que `>` no lo alcanzaba
+     y el nombre se partía en dos líneas en vez de recortarse. */
+  .topbar-title > div {
+    min-width: 0;
+  }
+
+  .topbar-title span {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
