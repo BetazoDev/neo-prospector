@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { Check, CircleAlert, X } from 'lucide-react'
 
 interface SettingsModalProps {
   isOpen: boolean
@@ -25,12 +26,12 @@ export default function SettingsModal({
   // Load saved settings from server DB session when modal opens
   useEffect(() => {
     if (isOpen) {
-      setSaveSuccess(false)
-      setSaveError('')
-
+      // El aviso de guardado anterior se limpia junto con la respuesta, fuera del render.
       fetch('/api/settings')
         .then((res) => (res.ok ? res.json() : null))
         .then((data) => {
+          setSaveSuccess(false)
+          setSaveError('')
           if (data && data.apiKey) {
             setApiKeyInput(data.apiKey)
             setHasSavedKey(true)
@@ -164,7 +165,7 @@ export default function SettingsModal({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#fff',
+                color: 'var(--text-primary)',
               }}
             >
               <svg viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -173,7 +174,7 @@ export default function SettingsModal({
               </svg>
             </div>
             <div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>Configuración del Sistema</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 500, color: 'var(--text-primary)' }}>Configuración del Sistema</div>
               <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>Ajustes de prospección y credenciales de Apify</div>
             </div>
           </div>
@@ -193,7 +194,7 @@ export default function SettingsModal({
               justifyContent: 'center',
             }}
           >
-            ✕
+            <X aria-hidden="true" style={{ width: 16, height: 16 }} />
           </button>
         </div>
 
@@ -207,7 +208,7 @@ export default function SettingsModal({
             marginBottom: 20,
           }}
         >
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
             <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M12 8V6a4 4 0 1 0-8 0v2M3 8h10v6H3V8z" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
@@ -218,7 +219,7 @@ export default function SettingsModal({
           <div style={{ marginBottom: 16 }}>
             <div className="modal-row" style={{ marginBottom: 6 }}>
               <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-secondary)' }}>
-                Apify API Key (Token) <span style={{ color: '#fff' }}>* Requerido</span>
+                Apify API Key (Token) <span style={{ color: 'var(--text-primary)' }}>* Requerido</span>
               </label>
               <span className={`badge ${hasSavedKey ? 'badge-success' : 'badge-error'}`} style={{ fontSize: 10 }}>
                 {hasSavedKey ? 'Configurada (Protegida)' : 'Requerida'}
@@ -238,7 +239,7 @@ export default function SettingsModal({
                   border: '1px solid var(--border-default)',
                   borderRadius: 'var(--radius-md)',
                   padding: '9px 12px',
-                  color: '#fff',
+                  color: 'var(--text-primary)',
                   fontSize: 13,
                   fontFamily: 'monospace',
                   outline: 'none',
@@ -257,7 +258,7 @@ export default function SettingsModal({
                   type="button"
                   className="btn btn-ghost btn-sm"
                   onClick={handleClearApiKey}
-                  style={{ padding: '0 10px', fontSize: 12, color: '#ef4444' }}
+                  style={{ padding: '0 10px', fontSize: 12, color: 'var(--danger)' }}
                   title="Borrar clave guardada"
                 >
                   Borrar
@@ -288,7 +289,7 @@ export default function SettingsModal({
                   border: '1px solid var(--border-default)',
                   borderRadius: 'var(--radius-md)',
                   padding: '9px 12px',
-                  color: '#fff',
+                  color: 'var(--text-primary)',
                   fontSize: 14,
                   fontWeight: 600,
                   outline: 'none',
@@ -305,14 +306,16 @@ export default function SettingsModal({
 
           {/* Messages & Actions */}
           {saveError && (
-            <div style={{ fontSize: 12, color: '#ff6b6b', marginBottom: 12, fontWeight: 600 }}>
-              ⚠️ {saveError}
+            <div style={{ fontSize: 12, color: 'var(--danger)', marginBottom: 12, fontWeight: 600 }}>
+              <CircleAlert aria-hidden="true" style={{ width: 14, height: 14, display: 'inline', verticalAlign: '-2px', marginRight: 6, color: 'var(--crimson)' }} />
+              {saveError}
             </div>
           )}
 
           <div className="modal-row" style={{ paddingTop: 6 }}>
-            <span style={{ fontSize: 12, color: '#fff', fontWeight: 600, opacity: saveSuccess ? 1 : 0, transition: 'opacity 0.2s' }}>
-              ✓ ¡Ajustes guardados correctamente!
+            <span style={{ fontSize: 12, color: 'var(--text-primary)', fontWeight: 600, opacity: saveSuccess ? 1 : 0, transition: 'opacity 0.2s' }}>
+              <Check aria-hidden="true" style={{ width: 14, height: 14, display: 'inline', verticalAlign: '-2px', marginRight: 6 }} />
+              Ajustes guardados
             </span>
             <button type="button" className="btn btn-secondary btn-sm" onClick={handleSaveSettings}>
               Guardar Ajustes
@@ -336,7 +339,7 @@ export default function SettingsModal({
               <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>
                 Motor Apify Scraper
               </div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: '#fff', marginTop: 2 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', marginTop: 2 }}>
                 Actor `compass/crawler-google-places`
               </div>
             </div>
@@ -359,7 +362,7 @@ export default function SettingsModal({
               <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>
                 Base de Datos
               </div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: '#fff', marginTop: 2 }}>PostgreSQL · {totalLeads} Leads</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', marginTop: 2 }}>PostgreSQL · {totalLeads} Leads</div>
             </div>
             <span className="badge badge-success">Activo</span>
           </div>
@@ -378,9 +381,9 @@ export default function SettingsModal({
               <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase' }}>
                 Dominio Productivo
               </div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: '#fff', marginTop: 2 }}>prospector.diabolicalservices.tech</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)', marginTop: 2 }}>prospector.diabolicalservices.tech</div>
             </div>
-            <span className="badge badge-success">SSL Let's Encrypt</span>
+            <span className="badge badge-success">SSL Let&apos;s Encrypt</span>
           </div>
         </div>
 

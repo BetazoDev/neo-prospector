@@ -6,6 +6,8 @@ import {
   getApifyRun,
   type ApifyLead,
 } from './apify'
+import { scheduleSiteChecks } from './pipeline/site-checks'
+import { triageLead } from './pipeline/triage'
 
 /** Una importación que lleve más de esto colgada se considera abandonada y se puede retomar. */
 const STALE_IMPORT_MS = 10 * 60 * 1000
@@ -56,7 +58,16 @@ async function markRetryable(jobId: number, message: string): Promise<SyncOutcom
 }
 
 function mapLead(item: ApifyLead, userId: string, jobId: number, niche: string, zone: string) {
+  const countryCode = item.countryCode?.trim().toLowerCase() || null
   return {
+    ...triageLead({
+      website: item.website ?? null,
+      phone: item.phone ?? null,
+      mapsUrl: item.url ?? null,
+      countryCode,
+      placeId: item.placeId ?? null,
+    }),
+    stageChangedAt: new Date(),
     userId,
     jobId,
     title: item.title ?? 'Sin nombre',
@@ -70,7 +81,7 @@ function mapLead(item: ApifyLead, userId: string, jobId: number, niche: string, 
     mapsUrl: item.url ?? null,
     searchNiche: niche,
     searchZone: zone,
-    countryCode: item.countryCode?.trim().toLowerCase() || null,
+    countryCode,
   }
 }
 
@@ -173,6 +184,9 @@ export async function syncScrapingJob(jobId: number): Promise<SyncOutcome> {
       where: { id: jobId },
       data: { status: 'done', leadsFound: leads.length, error: null },
     })
+
+    // La revisión de sitios arranca sola en cuanto la base queda guardada.
+    scheduleSiteChecks({ userId: job.userId, jobId })
 
     return { state: 'done', count: leads.length }
   } catch (error) {

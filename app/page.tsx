@@ -1,332 +1,149 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { useRouter } from 'next/navigation'
-import Sidebar, { NavItem } from './components/Sidebar'
-import StatsPanel from './components/StatsPanel'
-import AIAgentForm from './components/AIAgentForm'
-import BasesGrid, { JobBase } from './components/BasesGrid'
-import SettingsModal from './components/SettingsModal'
-import ImportCSVModal from './components/ImportCSVModal'
-import BottomNav from './components/BottomNav'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
+import { ArrowRight } from 'lucide-react'
+import AppShell, { useShell } from './components/shell/AppShell'
+import BaseRow, { type FieldBase } from './components/BaseRow'
+import DotField from './components/DotField'
+import SearchComposer, { type SearchComposerHandle } from './components/SearchComposer'
 
-interface Stats {
-  total: number
-  withPhone: number
-  avgRating: number | null
-  totalReviews: number | null
-}
+const LEGEND = [
+  { state: 'c', label: 'Candidato' },
+  { state: 'u', label: 'Revisión manual' },
+  { state: 'o', label: 'Sitio aceptable' },
+  { state: 'n', label: 'Sin sitio' },
+  { state: 'r', label: 'Revisando' },
+]
 
-export default function DashboardPage() {
-  const router = useRouter()
+/** Campo de muestra para el estado vacío: así se ve una base cuando ya está revisada. */
+const SAMPLE = 'ccooncpocnoucoonncocopoonccocnooucnocpoocconnoc'
 
-  const [jobs, setJobs] = useState<JobBase[]>([])
-  const [stats, setStats] = useState<Stats>({ total: 0, withPhone: 0, avgRating: null, totalReviews: null })
-  const [loading, setLoading] = useState(true)
+function Home() {
+  const { openImport, refresh: refreshShell } = useShell()
+  const [bases, setBases] = useState<FieldBase[] | null>(null)
+  const [maxLeads, setMaxLeads] = useState<number | null>(null)
+  const [now, setNow] = useState(() => Date.now())
+  const composer = useRef<SearchComposerHandle>(null)
 
-  // Navigation & Modals
-  const [activeNav, setActiveNav] = useState<NavItem>('dashboard')
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
-  const [isImportOpen, setIsImportOpen] = useState(false)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-
-  // Toast
-  const [toast, setToast] = useState<{ title: string; desc: string; type: 'success' | 'error' } | null>(null)
-
-  const showToast = (title: string, desc: string, type: 'success' | 'error' = 'success') => {
-    setToast({ title, desc, type })
-    setTimeout(() => setToast(null), 4000)
-  }
-
-  // Fetch jobs (bases)
-  const fetchJobs = useCallback(async () => {
-    setLoading(true)
+  const load = useCallback(async () => {
     try {
-      const res = await fetch('/api/jobs')
-      if (res.status === 401) {
-        router.push('/login')
-        return
-      }
+      const res = await fetch('/api/pipeline/fields?limit=6')
       if (res.ok) {
-        const data: JobBase[] = await res.json()
-        setJobs(data)
+        setBases((await res.json()).bases)
+        setNow(Date.now())
       }
-    } catch (err) {
-      console.error('Error fetching jobs:', err)
-    } finally {
-      setLoading(false)
-    }
-  }, [router])
-
-  // Fetch global stats
-  const fetchStats = useCallback(async () => {
-    try {
-      const res = await fetch('/api/leads?limit=1')
-      if (res.ok) {
-        const data = await res.json()
-        setStats(data.stats)
-      }
-    } catch (err) {
-      console.error('Error fetching stats:', err)
+    } catch {
+      // El siguiente sondeo lo vuelve a intentar.
     }
   }, [])
 
   useEffect(() => {
-    fetchJobs()
-    fetchStats()
-  }, [fetchJobs, fetchStats])
+    const first = setTimeout(load, 0)
+    fetch('/api/settings')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((s) => s?.maxLeads && setMaxLeads(s.maxLeads))
+      .catch(() => undefined)
+    // Desde la búsqueda global, "Nueva búsqueda" llega aquí con ?nueva=1.
+    if (new URLSearchParams(window.location.search).get('nueva')) composer.current?.focus()
+    return () => clearTimeout(first)
+  }, [load])
 
-  const handleDeleteJob = async (jobId: number) => {
-    try {
-      const res = await fetch(`/api/jobs?id=${jobId}`, { method: 'DELETE' })
-      if (res.ok) {
-        showToast('Base eliminada', 'Se removió la base y todos sus prospectos')
-        fetchJobs()
-        fetchStats()
-      }
-    } catch {
-      showToast('Error', 'No se pudo eliminar la base', 'error')
-    }
-  }
-
-  const handleRenameJob = async (jobId: number, newName: string) => {
-    try {
-      const res = await fetch(`/api/jobs?id=${jobId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newName }),
-      })
-      if (res.ok) {
-        showToast('Base renombrada', 'El nombre de la base ha sido actualizado')
-        fetchJobs()
-      }
-    } catch {
-      showToast('Error', 'No se pudo renombrar la base', 'error')
-    }
-  }
-
-  const handleLeadsFound = () => {
-    showToast('¡Prospección completada!', 'Se creó tu nueva base con los prospectos encontrados.')
-    fetchJobs()
-    fetchStats()
-  }
-
-  const handleCSVImported = () => {
-    showToast('¡CSV importado!', 'Se creó una nueva base con los leads del archivo CSV.')
-    fetchJobs()
-    fetchStats()
-  }
-
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/auth/logout', { method: 'POST' })
-      router.push('/login')
-      router.refresh()
-    } catch {
-      router.push('/login')
-    }
-  }
-
-  const handleNavigate = (nav: NavItem) => {
-    setActiveNav(nav)
-    if (nav === 'dashboard') {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    } else if (nav === 'agent') {
-      const el = document.getElementById('agent-section')
-      if (el) el.scrollIntoView({ behavior: 'smooth' })
-      const input = document.getElementById('niche-input') as HTMLInputElement
-      if (input) input.focus()
-    } else if (nav === 'leads') {
-      const el = document.getElementById('bases-section')
-      if (el) el.scrollIntoView({ behavior: 'smooth' })
-    } else if (nav === 'settings') {
-      setIsSettingsOpen(true)
-    }
-  }
-
-  const handleExportAllCSV = async () => {
-    try {
-      const res = await fetch('/api/leads?limit=10000')
-      if (!res.ok) return
-      const data = await res.json()
-      const leads = data.leads
-
-      if (!leads || leads.length === 0) {
-        showToast('Sin leads', 'No hay prospectos para exportar', 'error')
-        return
-      }
-
-      const headers = [
-        'ID',
-        'Empresa',
-        'Categoría',
-        'Teléfono',
-        'Rating',
-        'Reseñas',
-        'Ciudad',
-        'Dirección',
-        'Sitio Web',
-        'Google Maps',
-        'Nicho',
-        'Zona',
-      ]
-      const rows = leads.map((l: any) => [
-        l.id,
-        `"${(l.title || '').replace(/"/g, '""')}"`,
-        `"${(l.category ?? '').replace(/"/g, '""')}"`,
-        `"${l.phone ?? ''}"`,
-        l.rating ?? '',
-        l.reviewsCount ?? '',
-        `"${(l.city ?? '').replace(/"/g, '""')}"`,
-        `"${(l.address ?? '').replace(/"/g, '""')}"`,
-        `"${l.website ?? ''}"`,
-        `"${l.mapsUrl ?? ''}"`,
-        `"${l.searchNiche ?? ''}"`,
-        `"${l.searchZone ?? ''}"`,
-      ])
-
-      const csvContent = [headers.join(','), ...rows.map((r: any) => r.join(','))].join('\n')
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.setAttribute('download', `neo-prospector-todos-los-leads-${new Date().toISOString().split('T')[0]}.csv`)
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      showToast('Exportación iniciada', 'Se descargaron todos los prospectos en CSV')
-    } catch {
-      showToast('Error', 'No se pudo exportar el CSV', 'error')
-    }
-  }
+  // Mientras alguna base se busca o se revisa, el campo se refresca para verla llenarse.
+  const live = !!bases?.some((b) => b.status === 'running' || b.status === 'importing' || /[pr]/.test(b.dots))
+  useEffect(() => {
+    if (!live) return
+    const timer = setInterval(load, 3000)
+    return () => clearInterval(timer)
+  }, [live, load])
 
   return (
-    <>
-      <Sidebar
-        activeNav={activeNav}
-        onNavigate={handleNavigate}
-        mobileOpen={isMobileMenuOpen}
-        onCloseMobile={() => setIsMobileMenuOpen(false)}
-      />
+    <section className="home field-carbon">
+      <div className="page home-grid">
+        <div>
+          <h1 className="display home-title">
+            ¿Qué negocios
+            <span className="dim">buscamos hoy?</span>
+          </h1>
+          <p className="home-lede">
+            Escribe un giro y una zona. Buscamos en Google Maps y revisamos el sitio de cada negocio para decirte a quién le hace falta uno nuevo.
+          </p>
+          <SearchComposer
+            ref={composer}
+            maxLeads={maxLeads}
+            onStarted={() => {
+              load()
+              refreshShell()
+            }}
+            onFinished={() => {
+              load()
+              refreshShell()
+            }}
+            onImport={openImport}
+          />
+        </div>
 
-      <main className="main-content">
-        {/* Topbar */}
-        <div className="topbar">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <button
-              className="topbar-mobile-btn"
-              onClick={() => setIsMobileMenuOpen(true)}
-              aria-label="Abrir menú"
-            >
-              <svg viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <path d="M2 4h12M2 8h12M2 12h12" strokeLinecap="round" />
-              </svg>
-            </button>
-            <div className="topbar-title">
-              <div className="topbar-accent-bar" />
-              Dashboard de Prospectos
+        <div>
+          <div className="section-head">
+            <h2 className="section-title">Tus bases</h2>
+            <div className="mini-legend" aria-label="Qué significa cada punto">
+              {LEGEND.map((item) => (
+                <span key={item.state}>
+                  <span className={`dot dot-${item.state}`} aria-hidden="true" />
+                  {item.label}
+                </span>
+              ))}
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span className="desktop-only-hide" style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
-              prospector.diabolicalservices.tech
-            </span>
-            <button
-              className="btn btn-ghost btn-sm"
-              onClick={() => setIsImportOpen(true)}
-              title="Importar CSV"
-              id="import-csv-btn"
-            >
-              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 13, height: 13 }}>
-                <path d="M7 1v8M4 6l3 3 3-3" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M1 11h12" strokeLinecap="round" />
-              </svg>
-              <span className="desktop-only-hide">Importar CSV</span>
-            </button>
-            <button
-              className="btn btn-ghost btn-sm"
-              onClick={() => {
-                fetchJobs()
-                fetchStats()
-              }}
-              title="Actualizar"
-            >
-              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 13, height: 13 }}>
-                <path d="M1 7A6 6 0 0 1 7 1c1.97 0 3.7.95 4.8 2.4M13 7A6 6 0 0 1 7 13c-1.97 0-3.7-.95-4.8-2.4" strokeLinecap="round" />
-                <path d="M11 1v3h-3M3 13v-3h3" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <span className="desktop-only-hide">Actualizar</span>
-            </button>
-            <button
-              className="btn btn-ghost btn-sm"
-              onClick={handleLogout}
-              title="Cerrar Sesión"
-              aria-label="Cerrar Sesión"
-              style={{ color: '#ef4444' }}
-            >
-              {/* Con el rótulo oculto en móvil, sin icono el botón quedaba vacío. */}
-              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 13, height: 13 }}>
-                <path d="M5.5 12.5H2.5a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h3" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M9 9.5 12.5 7 9 4.5M12.5 7H5.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <span className="desktop-only-hide">Cerrar Sesión</span>
-            </button>
-          </div>
-        </div>
-
-        <div className="page-container">
-          {/* Stats */}
-          <StatsPanel stats={stats} loading={loading && stats.total === 0} />
-
-          {/* AI Agent Form */}
-          <div id="agent-section">
-            <AIAgentForm onLeadsFound={handleLeadsFound} onJobStarted={fetchJobs} />
-          </div>
-
-          {/* Bases Grid (Airtable style) */}
-          <div id="bases-section">
-            <BasesGrid
-              jobs={jobs}
-              onDeleteJob={handleDeleteJob}
-              onRenameJob={handleRenameJob}
-              loading={loading}
-            />
-          </div>
-        </div>
-      </main>
-
-      <BottomNav activeNav={activeNav} onNavigate={handleNavigate} />
-
-      {/* Settings Modal */}
-      <SettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => {
-          setIsSettingsOpen(false)
-          setActiveNav('dashboard')
-        }}
-        totalLeads={stats.total}
-        onExportCSV={handleExportAllCSV}
-      />
-
-      {/* Import CSV Modal */}
-      <ImportCSVModal
-        isOpen={isImportOpen}
-        onClose={() => setIsImportOpen(false)}
-        onImported={handleCSVImported}
-      />
-
-      {/* Toast */}
-      {toast && (
-        <div className="toast-container">
-          <div className={`toast toast-${toast.type}`}>
-            <div>
-              <div className="toast-title">{toast.title}</div>
-              <div className="toast-desc">{toast.desc}</div>
+          {bases === null && (
+            <div className="base-rows" aria-hidden="true">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="base-row">
+                  <div>
+                    <div className="skeleton" style={{ width: 180, height: 22 }} />
+                    <div className="skeleton" style={{ width: 120, height: 12, marginTop: 10 }} />
+                  </div>
+                  <div className="skeleton" style={{ height: 40 }} />
+                  <div className="skeleton" style={{ width: 48, height: 32, marginLeft: 'auto' }} />
+                </div>
+              ))}
             </div>
-          </div>
+          )}
+
+          {bases?.length === 0 && (
+            <div className="empty-bases">
+              <h3>Aquí aparece cada búsqueda</h3>
+              <p>
+                Cada negocio que encontremos será un punto. Se pinta de carmesí cuando su sitio necesita un rediseño, así ves de un vistazo
+                dónde hay trabajo.
+              </p>
+              <DotField dots={SAMPLE} label="Ejemplo de una base revisada" />
+            </div>
+          )}
+
+          {bases && bases.length > 0 && (
+            <>
+              <div className="base-rows">
+                {bases.map((base) => (
+                  <BaseRow key={base.id} base={base} now={now} variant="feature" dotSize="lg" />
+                ))}
+              </div>
+              <Link href="/bases" className="btn btn-ghost btn-sm" style={{ marginTop: 20 }}>
+                Ver todas las bases <ArrowRight aria-hidden="true" />
+              </Link>
+            </>
+          )}
         </div>
-      )}
-    </>
+      </div>
+    </section>
+  )
+}
+
+export default function HomePage() {
+  return (
+    <AppShell active="inicio">
+      <Home />
+    </AppShell>
   )
 }

@@ -23,6 +23,21 @@ export async function GET(req: NextRequest) {
       },
     })
 
+    // Lo que interesa de cada base: cuántos candidatos dejó la revisión y si sigue revisando.
+    const [candidates, checking] = await Promise.all([
+      prisma.lead.groupBy({ by: ['jobId'], where: { userId, stage: 'candidate' }, _count: { _all: true } }),
+      prisma.lead.groupBy({
+        by: ['jobId'],
+        where: { userId, checkState: { in: ['pending', 'running'] } },
+        _count: { _all: true },
+      }),
+    ])
+    const countFor = (rows: typeof candidates, jobId: number) => rows.find((r) => r.jobId === jobId)?._count._all ?? 0
+    const withPipeline = jobs.map((job) => ({
+      ...job,
+      pipeline: { candidates: countFor(candidates, job.id), checking: countFor(checking, job.id) },
+    }))
+
     // Recupera búsquedas que quedaron colgadas (navegador cerrado, webhook perdido)
     // sin hacer esperar al dashboard. Aparecerán resueltas en la siguiente carga.
     after(async () => {
@@ -33,7 +48,7 @@ export async function GET(req: NextRequest) {
       }
     })
 
-    return NextResponse.json(jobs)
+    return NextResponse.json(withPipeline)
   } catch (error) {
     console.error('Error fetching jobs:', error)
     return NextResponse.json({ error: String(error) }, { status: 500 })

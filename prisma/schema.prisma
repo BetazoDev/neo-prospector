@@ -74,5 +74,38 @@ model Lead {
   countryCode  String?
   createdAt    DateTime     @default(now())
 
+  /// Identificador del lugar en Google Maps: el mismo negocio puede salir en varias bases.
+  placeId        String?
+  /// Dominio normalizado del sitio (sin www), para no revisar dos veces el mismo sitio.
+  domain         String?
+  /// Lo que trae el campo "Sitio web": web | social | whatsapp | none
+  siteKind       String?
+  /// Teléfono de Maps solo con dígitos y código de país, listo para wa.me.
+  phoneDigits    String?
+  /// Etapa del embudo; los valores viven en lib/pipeline/stages.ts.
+  stage          String       @default("new")
+  stageChangedAt DateTime?
+
+  /// Cola de la revisión del sitio: pending | running | done | error | skipped
+  checkState     String?
+  checkClaimedAt DateTime?
+  checkedAt      DateTime?
+  checkError     String?
+  /// ok | broken | dead | parked | construction | hacked | social | unverified
+  siteStatus     String?
+  httpStatus     Int?
+  finalUrl       String?
+  siteTitle      String?
+  siteCms        String?
+  /// Problemas detectados: [{ code, label, weight }]
+  siteIssues     Json?
+  /// Qué tan buena oportunidad de rediseño es (0-100): más alto, peor está el sitio.
+  siteScore      Int?
+  /// Números de WhatsApp que el propio sitio publica (wa.me, api.whatsapp.com).
+  siteWhatsapp   String[]     @default([])
+
+  @@index([userId, stage])
+  @@index([jobId, checkState])
+  @@index([domain])
   @@map("leads")
 }

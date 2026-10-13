@@ -1,0 +1,73 @@
+{
+  "title": "Elige la estructura del Prospector",
+  "question": "Las tres usan el mundo de hemeron.com (carbón, niebla, carmesí, Clash Grotesk y Switzer) y tienen búsqueda al centro del inicio, bases recientes, contadores por etapa, buscador global y actividad en vivo. Cambia cómo se organiza la pantalla.",
+  "options": [
+    {
+      "id": "dots",
+      "label": "Campo de puntos",
+      "kicker": "THE ROLL",
+      "lineage": "el calendario de puntos de hemeron.com, vuelto datos",
+      "thesis": "Cada negocio encontrado es un punto: el inicio es tu buscador sobre el mapa vivo de todas tus bases.",
+      "palette": [
+        "#0e0e0e",
+        "#ecebeb",
+        "#ce0037",
+        "#f6f6f5",
+        "#d7d8d7"
+      ],
+      "materials": [
+        "campo carbón a sangre",
+        "puntos de 6 px por negocio",
+        "pastillas carmesí"
+      ],
+      "viewport": "Barra superior carbón con logo, buscador global y actividad; abajo, a la izquierda el titular «¿Qué negocios buscamos hoy?» con giro, zona y Buscar; a la derecha cada base reciente es una fila de puntos (carmesí candidato, papel revisado, tenue pendiente, latiendo el que se revisa ahora) y los contadores por etapa corren bajo el campo.",
+      "risk": "Con miles de negocios los puntos se vuelven textura: hay que agrupar por base y paginar el campo.",
+      "html": ".impeccable/mocks/decision/dots.html"
+    },
+    {
+      "id": "rail",
+      "label": "Riel Hemeron",
+      "lineage": "la navegación de hemeron.com puesta en un riel lateral",
+      "thesis": "Un riel carbón siempre a la vista con todo el embudo; el lienzo claro es solo para trabajar.",
+      "palette": [
+        "#0e0e0e",
+        "#ecebeb",
+        "#ce0037",
+        "#d7d8d7",
+        "#f6f6f5"
+      ],
+      "materials": [
+        "riel carbón",
+        "lienzo niebla",
+        "etiquetas en mayúsculas espaciadas",
+        "pastillas carmesí"
+      ],
+      "viewport": "Riel izquierdo carbón de 248 px: logo, buscador global, botón Buscar negocios, etapas con su número, bases recientes con candidatos y, al pie, la tarjeta de actividad en vivo; en el lienzo niebla, el buscador grande con titular en Clash y debajo las bases recientes como filas con su embudo.",
+      "risk": "Es la estructura más conocida: si la marca no está en cada detalle se ve como cualquier panel de administración.",
+      "html": ".impeccable/mocks/decision/rail.html"
+    },
+    {
+      "id": "command",
+      "label": "Barra de mando",
+      "lineage": "el hero de hemeron.com: una sola frase grande y una acción",
+      "thesis": "Una sola barra de mando escribe la búsqueda en lenguaje natural y encuentra cualquier negocio; sin riel lateral.",
+      "palette": [
+        "#0e0e0e",
+        "#ce0037",
+        "#ecebeb",
+        "#f6f6f5",
+        "#6e0112"
+      ],
+      "materials": [
+        "barra superior a todo lo ancho",
+        "campo de mando gigante",
+        "fichas de base en carrusel"
+      ],
+      "viewport": "Barra superior carbón con logo, etapas como pestañas con número y la actividad como pastilla que se abre en panel; el inicio es un campo carbón con el calendario de puntos arriba y un campo de mando enorme («dentistas en Querétaro») con Buscar; debajo, las bases recientes en fichas que se desplazan.",
+      "risk": "Separar giro y zona de una frase libre debe ser confiable; siempre queda la opción de dos campos.",
+      "html": ".impeccable/mocks/decision/command.html"
+    }
+  ],
+  "reroll": true,
+  "steer": true
+}

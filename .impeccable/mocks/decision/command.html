@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Barra de mando</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1440px;height:900px;overflow:hidden;background:#0e0e0e;color:#f6f6f5;font-family:Switzer,'Helvetica Neue',Arial,sans-serif}
+.top{height:68px;display:flex;align-items:center;gap:32px;padding:0 48px;border-bottom:1px solid #222}
+.logo{font-family:'Clash Grotesk','Helvetica Neue',Arial,sans-serif;font-size:24px;font-weight:500}
+.tabs{display:flex;gap:6px}
+.tab{height:36px;padding:0 14px;border-radius:999px;display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:#b4b4b2}
+.tab b{font-weight:500;color:#f6f6f5}.tab.on{background:#1b1b1b;color:#f6f6f5}.tab.on b{color:#ff5c80}
+.right{margin-left:auto;display:flex;gap:10px;align-items:center}
+.find{height:36px;width:220px;border:1px solid #2c2c2c;border-radius:999px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:13px;color:#8a8a88}
+.act{height:36px;padding:0 14px;border-radius:999px;border:1px solid rgba(206,0,55,.5);display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.act i{width:8px;height:8px;border-radius:50%;background:#ce0037}
+.hero{padding:56px 48px 40px}
+.cal{display:grid;grid-template-rows:repeat(7,5px);grid-auto-flow:column;grid-auto-columns:5px;gap:6px;margin-bottom:12px}
+.cal i{width:5px;height:5px;border-radius:50%;background:#2b2b2b}.cal i.p{background:#8a8a88}.cal i.t{background:#ce0037}
+.meta{display:flex;justify-content:space-between;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:#8a8a88;margin-bottom:48px}
+h1{font-family:'Clash Grotesk','Helvetica Neue',Arial,sans-serif;font-weight:500;font-size:72px;line-height:1;letter-spacing:-.03em}
+h1 span{color:#6f6f6d}
+.bar{margin-top:36px;height:84px;border-radius:999px;background:#f6f6f5;color:#111;display:flex;align-items:center;padding:0 12px 0 36px;gap:16px}
+.bar .q{font-family:'Clash Grotesk','Helvetica Neue',Arial,sans-serif;font-size:32px;font-weight:500;flex:1}
+.bar .q span{color:#8a8a88}
+.bar .go{height:60px;padding:0 34px;border-radius:999px;background:#ce0037;color:#fff;display:flex;align-items:center;font-size:14px;letter-spacing:.07em;text-transform:uppercase;font-weight:500}
+.hint{margin-top:16px;display:flex;gap:10px;font-size:13px;color:#8a8a88}
+.hint span{border:1px solid #2c2c2c;border-radius:999px;padding:6px 12px}
+.shelf{position:absolute;left:0;right:0;bottom:0;padding:0 48px 40px}
+.sh{display:flex;justify-content:space-between;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:#8a8a88;margin-bottom:14px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.card{background:#ecebeb;color:#111;border-radius:18px;padding:20px 22px;height:150px;display:flex;flex-direction:column;justify-content:space-between}
+.card h3{font-family:'Clash Grotesk','Helvetica Neue',Arial,sans-serif;font-weight:500;font-size:22px;line-height:1.1}
+.card p{font-size:12px;color:#6f6f6d;margin-top:4px}
+.card .k{display:flex;justify-content:space-between;align-items:end}
+.card .k b{font-family:'Clash Grotesk','Helvetica Neue',Arial,sans-serif;font-size:34px;font-weight:500;color:#ce0037}
+.card .k span{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#6f6f6d}
+.card.live{background:#141414;color:#f6f6f5;border:1px solid #2c2c2c}
+.card.live p{color:#8a8a88}
+</style></head><body>
+<div class="top">
+  <div class="logo">hemeron</div>
+  <div class="tabs"><div class="tab on">Candidatos <b>46</b></div><div class="tab">Demo lista <b>0</b></div><div class="tab">Por contactar <b>6</b></div><div class="tab">Respondieron <b>0</b></div></div>
+  <div class="right"><div class="find">Buscar en todo <span>⌘K</span></div><div class="act"><i></i>1 tarea en curso</div></div>
+</div>
+<section class="hero">
+  <div class="cal"><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="p"></i><i class="t"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="meta"><span>2026 · 3 búsquedas este mes</span><span>Aguascalientes, MX · 00:55</span></div>
+  <h1>Encuentra a quién le hace falta <span>un sitio nuevo.</span></h1>
+  <div class="bar"><div class="q">dentistas en <span>Querétaro</span></div><div class="go">Buscar</div></div>
+  <div class="hint"><span>Giro: Dentistas</span><span>Zona: Querétaro, México</span><span>Hasta 100 negocios</span></div>
+</section>
+<section class="shelf">
+  <div class="sh"><span>Bases recientes</span><span>Ver todas</span></div>
+  <div class="cards">
+    <div class="card live"><div><h3>Abogados CDMX · base 5</h3><p>Revisando sitios · 33 de 63</p></div><div class="k"><b>29</b><span>candidatos</span></div></div>
+    <div class="card"><div><h3>Dentistas · Querétaro</h3><p>48 negocios · ejemplo</p></div><div class="k"><b>6</b><span>candidatos</span></div></div>
+    <div class="card"><div><h3>Gimnasios · Aguascalientes</h3><p>72 negocios · ejemplo</p></div><div class="k"><b>11</b><span>candidatos</span></div></div>
+    <div class="card"><div><h3>Clínicas · León</h3><p>55 negocios · ejemplo</p></div><div class="k"><b>9</b><span>candidatos</span></div></div>
+  </div>
+</section>
+</body></html>

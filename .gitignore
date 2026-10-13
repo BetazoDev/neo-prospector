@@ -7,3 +7,7 @@ node_modules
 *.tsbuildinfo
 prisma/dev.db
 prisma/prod.db
+
+# Capturas de revisión de diseño (se regeneran)
+.impeccable/review/
+.impeccable/questions/

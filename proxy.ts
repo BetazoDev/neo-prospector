@@ -5,7 +5,7 @@ const JWT_SECRET_STRING = process.env.JWT_SECRET || 'neoprospector_super_secret_
 const JWT_SECRET = new TextEncoder().encode(JWT_SECRET_STRING)
 
 // `/api/apify/webhook` se autentica con su propio secreto por base, no con la cookie.
-const PUBLIC_PATHS = ['/login', '/api/auth/login', '/api/health', '/api/apify/webhook', '/favicon.ico']
+const PUBLIC_PATHS = ['/login', '/api/auth/login', '/api/health', '/api/apify/webhook', '/icon.svg']
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
@@ -51,5 +51,5 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  matcher: ['/((?!_next/static|_next/image|icon.svg).*)'],
 }

@@ -4,7 +4,8 @@ import { prisma } from '@/lib/prisma'
 import { launchApifyScrape, resolveCountryCode } from '@/lib/apify'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
 
-const PALETTE = ['#7c3aed', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#8b5cf6', '#06b6d4']
+// Tonos de la marca Hemeron para distinguir las bases sin romper la paleta.
+const PALETTE = ['#ce0037', '#6e0112', '#d7d8d7', '#b4b4b2', '#f2c14e', '#5fd39a', '#8a8a88', '#ecebeb']
 
 function initialsFor(text: string, fallback: string): string {
   const initials = text
@@ -89,7 +90,7 @@ export async function POST(req: NextRequest) {
       zone,
       status: 'running',
       name: `${niche} · ${zone}`,
-      icon: initialsFor(niche, 'NP'),
+      icon: initialsFor(niche, 'HP'),
       color: colorFor(niche),
       webhookToken,
     },

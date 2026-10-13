@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Campo de puntos</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1440px;height:900px;overflow:hidden;background:#0e0e0e;color:#f6f6f5;font-family:Switzer,'Helvetica Neue',Arial,sans-serif}
+.top{height:64px;display:flex;align-items:center;gap:28px;padding:0 40px;border-bottom:1px solid #222}
+.logo{font-family:'Clash Grotesk','Helvetica Neue',Arial,sans-serif;font-size:24px;font-weight:500}
+.nav{display:flex;gap:22px;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:#b4b4b2}
+.nav b{color:#f6f6f5;font-weight:500}
+.cmd{margin-left:auto;width:360px;height:38px;border:1px solid #2c2c2c;border-radius:999px;display:flex;align-items:center;padding:0 16px;color:#8a8a88;font-size:13px;justify-content:space-between}
+.act{height:38px;padding:0 16px;border-radius:999px;background:#1b1b1b;display:flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.pulse{width:8px;height:8px;border-radius:50%;background:#ce0037;box-shadow:0 0 0 4px rgba(206,0,55,.2)}
+main{display:grid;grid-template-columns:520px 1fr;gap:64px;padding:56px 40px 0}
+h1{font-family:'Clash Grotesk','Helvetica Neue',Arial,sans-serif;font-weight:500;font-size:64px;line-height:1;letter-spacing:-.03em}
+h1 span{color:#6f6f6d;display:block}
+.lede{margin-top:20px;font-size:17px;line-height:1.55;color:rgba(246,246,245,.72);max-width:440px}
+form{margin-top:36px;display:flex;flex-direction:column;gap:12px}
+.field{height:56px;border:1px solid #2c2c2c;background:#141414;border-radius:12px;display:flex;flex-direction:column;justify-content:center;padding:0 18px}
+.field small{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8a8a88}
+.field div{font-size:17px;margin-top:2px}
+.go{margin-top:6px;height:52px;border-radius:999px;background:#ce0037;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;letter-spacing:.07em;text-transform:uppercase;font-weight:500}
+.field-head{display:flex;justify-content:space-between;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:#8a8a88;margin-bottom:22px}
+.row{display:grid;grid-template-columns:260px 1fr 90px;gap:20px;align-items:center;padding:16px 0;border-top:1px solid #1f1f1f}
+.row h3{font-family:'Clash Grotesk','Helvetica Neue',Arial,sans-serif;font-weight:500;font-size:22px;line-height:1.1}
+.row p{font-size:12px;color:#8a8a88;margin-top:4px}
+.dots{display:flex;flex-wrap:wrap;gap:5px}
+.dots i{width:7px;height:7px;border-radius:50%;background:#2b2b2b}
+.dots i.c{background:#ce0037}.dots i.o{background:#8a8a88}.dots i.n{background:#3d3d3d}.dots i.r{background:#f6f6f5;box-shadow:0 0 0 3px rgba(246,246,245,.18)}
+.num{font-family:'Clash Grotesk','Helvetica Neue',Arial,sans-serif;font-size:28px;text-align:right;color:#ff5c80}
+.num small{display:block;font-family:Switzer,Arial,sans-serif;font-size:11px;color:#8a8a88;letter-spacing:.06em;text-transform:uppercase}
+.stages{position:absolute;left:0;right:0;bottom:0;height:88px;border-top:1px solid #222;display:grid;grid-template-columns:repeat(5,1fr)}
+.stages div{padding:18px 40px;border-left:1px solid #1f1f1f}
+.stages div:first-child{border-left:none}
+.stages b{font-family:'Clash Grotesk','Helvetica Neue',Arial,sans-serif;font-weight:500;font-size:30px;display:block}
+.stages span{font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:#8a8a88}
+.stages .hot b{color:#ff5c80}
+</style></head><body>
+<div class="top">
+  <div class="logo">hemeron</div>
+  <div class="nav"><b>Inicio</b><span>Bases</span><span>Embudo</span><span>Ajustes</span></div>
+  <div class="cmd">Buscar negocio, dominio o teléfono <span>⌘K</span></div>
+  <div class="act"><span class="pulse"></span>Revisando sitios · 33 de 63</div>
+</div>
+<main>
+  <section>
+    <h1>¿Qué negocios<span>buscamos hoy?</span></h1>
+    <p class="lede">Escribe un giro y una zona. Buscamos en Google Maps y revisamos el sitio de cada negocio por ti.</p>
+    <form>
+      <div class="field"><small>Giro</small><div>Dentistas</div></div>
+      <div class="field"><small>Zona</small><div>Querétaro, México</div></div>
+      <div class="go">Buscar negocios</div>
+    </form>
+  </section>
+  <section>
+    <div class="field-head"><span>Tus bases · cada punto es un negocio</span><span>Candidato · Revisado · Sin sitio · Revisando</span></div>
+    <div class="row"><div><h3>Abogados CDMX · base 5</h3><p>100 negocios · revisando ahora</p></div>
+      <div class="dots"><i class="c"></i><i class="c"></i><i class="c"></i><i class="c"></i><i class="o"></i><i class="c"></i><i class="o"></i><i class="o"></i><i class="c"></i><i class="n"></i><i class="n"></i><i class="c"></i><i class="o"></i><i class="r"></i><i class="r"></i><i class="r"></i><i></i><i></i><i></i><i></i><i class="c"></i><i class="c"></i><i class="o"></i><i class="n"></i><i class="n"></i><i class="n"></i><i class="o"></i><i class="c"></i><i class="o"></i><i class="o"></i><i class="c"></i><i class="n"></i><i class="o"></i><i class="c"></i><i class="o"></i><i class="n"></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="c"></i><i class="o"></i><i class="c"></i><i class="n"></i><i class="n"></i><i class="o"></i><i class="c"></i><i class="o"></i></div>
+      <div class="num">29<small>candidatos</small></div></div>
+    <div class="row"><div><h3>Dentistas · Querétaro</h3><p>48 negocios · ejemplo</p></div>
+      <div class="dots"><i class="o"></i><i class="c"></i><i class="o"></i><i class="o"></i><i class="n"></i><i class="c"></i><i class="o"></i><i class="o"></i><i class="o"></i><i class="n"></i><i class="c"></i><i class="o"></i><i class="o"></i><i class="n"></i><i class="o"></i><i class="o"></i><i class="c"></i><i class="o"></i><i class="n"></i><i class="o"></i><i class="o"></i><i class="o"></i><i class="c"></i><i class="o"></i></div>
+      <div class="num">6<small>candidatos</small></div></div>
+    <div class="row"><div><h3>Gimnasios · Aguascalientes</h3><p>72 negocios · ejemplo</p></div>
+      <div class="dots"><i class="n"></i><i class="n"></i><i class="c"></i><i class="o"></i><i class="n"></i><i class="c"></i><i class="c"></i><i class="o"></i><i class="n"></i><i class="n"></i><i class="o"></i><i class="c"></i><i class="n"></i><i class="o"></i><i class="n"></i><i class="c"></i><i class="o"></i><i class="n"></i><i class="n"></i><i class="o"></i><i class="c"></i><i class="o"></i><i class="n"></i><i class="o"></i><i class="n"></i><i class="c"></i><i class="o"></i><i class="n"></i><i class="o"></i><i class="n"></i><i class="c"></i><i class="n"></i><i class="o"></i><i class="n"></i><i class="o"></i><i class="n"></i></div>
+      <div class="num">11<small>candidatos</small></div></div>
+  </section>
+</main>
+<div class="stages">
+  <div class="hot"><b>46</b><span>Candidatos</span></div>
+  <div><b>0</b><span>Demo lista</span></div>
+  <div><b>6</b><span>Por contactar</span></div>
+  <div><b>0</b><span>Respondieron</span></div>
+  <div><b>0</b><span>Clientes</span></div>
+</div>
+</body></html>

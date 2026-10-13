@@ -1,0 +1,553 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-13T13:34:18+00:00",
+  "title": "Design System: Hemeron Prospector",
+  "extensions": {
+    "colorMeta": {
+      "carbon": {
+        "role": "neutral",
+        "displayName": "Carbon",
+        "canonical": "oklch(16.4% 0 0)",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      },
+      "niebla": {
+        "role": "neutral",
+        "displayName": "Niebla",
+        "canonical": "oklch(94.1% 0.001 17)",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#626161",
+          "#838282",
+          "#a6a5a5",
+          "#c9c9c9",
+          "#efeeee"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "oklch(97.3% 0.001 106)",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424241",
+          "#616160",
+          "#828281",
+          "#a5a5a4",
+          "#c9c9c8",
+          "#eeeeee"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "oklch(17.8% 0 0)",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      },
+      "crimson": {
+        "role": "primary",
+        "displayName": "Hemeron Crimson",
+        "canonical": "oklch(53.9% 0.216 19)",
+        "tonalRamp": [
+          "#2f0000",
+          "#530008",
+          "#940005",
+          "#bd002a",
+          "#ce0037",
+          "#e72f4b",
+          "#ffa6a7",
+          "#ffcbcb"
+        ]
+      },
+      "vino": {
+        "role": "primary",
+        "displayName": "Vino (pressed)",
+        "canonical": "oklch(34.0% 0.136 23)",
+        "tonalRamp": [
+          "#240000",
+          "#450f11",
+          "#6e0112",
+          "#a03a3b",
+          "#c75d5b",
+          "#ee807c",
+          "#fab5b0",
+          "#ffdad5"
+        ]
+      },
+      "amber": {
+        "role": "state",
+        "displayName": "Amber (manual review)",
+        "canonical": "oklch(83.4% 0.141 85)",
+        "tonalRamp": [
+          "#1a0500",
+          "#372000",
+          "#633700",
+          "#855800",
+          "#a87a00",
+          "#cd9d1d",
+          "#f2c14e",
+          "#ffebad"
+        ]
+      },
+      "good": {
+        "role": "state",
+        "displayName": "Good Green",
+        "canonical": "oklch(78.5% 0.135 160)",
+        "tonalRamp": [
+          "#001401",
+          "#003016",
+          "#005626",
+          "#007745",
+          "#119a65",
+          "#48be87",
+          "#5fd39a",
+          "#c0ffdc"
+        ]
+      },
+      "carbon-2": {
+        "role": "neutral",
+        "displayName": "Carbon 2"
+      },
+      "carbon-3": {
+        "role": "neutral",
+        "displayName": "Carbon 3"
+      },
+      "carbon-4": {
+        "role": "neutral",
+        "displayName": "Carbon 4"
+      },
+      "line-dark": {
+        "role": "neutral",
+        "displayName": "Dark Rule"
+      },
+      "line-dark-strong": {
+        "role": "neutral",
+        "displayName": "Dark Rule Strong"
+      },
+      "line-light": {
+        "role": "neutral",
+        "displayName": "Light Rule"
+      },
+      "line-light-strong": {
+        "role": "neutral",
+        "displayName": "Light Rule Strong"
+      },
+      "on-dark": {
+        "role": "neutral",
+        "displayName": "Ink on Dark"
+      },
+      "on-dark-2": {
+        "role": "neutral",
+        "displayName": "Ink on Dark 2"
+      },
+      "on-dark-3": {
+        "role": "neutral",
+        "displayName": "Ink on Dark 3"
+      },
+      "on-dark-dim": {
+        "role": "neutral",
+        "displayName": "Dim Ink"
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Ink 2"
+      },
+      "ink-3": {
+        "role": "neutral",
+        "displayName": "Ink 3"
+      },
+      "crimson-hover": {
+        "role": "primary",
+        "displayName": "Pressed Crimson"
+      },
+      "crimson-soft": {
+        "role": "primary",
+        "displayName": "Crimson Wash"
+      },
+      "row-active": {
+        "role": "primary",
+        "displayName": "Blush"
+      },
+      "amber-ink": {
+        "role": "state",
+        "displayName": "Amber Ink"
+      },
+      "dot-pending": {
+        "role": "state",
+        "displayName": "Pending Dot"
+      },
+      "dot-fine": {
+        "role": "state",
+        "displayName": "Fine Grey"
+      },
+      "dot-discarded": {
+        "role": "state",
+        "displayName": "Discarded Dot"
+      },
+      "on-crimson": {
+        "role": "neutral",
+        "displayName": "White (on crimson)"
+      },
+      "good-ink": {
+        "role": "neutral",
+        "displayName": "Forest Ink"
+      },
+      "good-ink-rule": {
+        "role": "neutral",
+        "displayName": "Forest Rule"
+      },
+      "rating-star": {
+        "role": "neutral",
+        "displayName": "Rating Gold"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The home question only; dimmed second line; 42px on mobile."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Page titles in carbon page heads, with dimmed second line."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Section titles."
+      },
+      "title-sm": {
+        "displayName": "Title Small",
+        "purpose": "Base-row names and empty states."
+      },
+      "numeral": {
+        "displayName": "Numeral",
+        "purpose": "Base-row candidate counts; crimson when it marks opportunity."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Lead names and reading text; tabular figures."
+      },
+      "body-sm": {
+        "displayName": "Body Small",
+        "purpose": "Meta lines, light-field buttons, WhatsApp pills, chips."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Uppercase tracked meta, legends, column heads, stage names."
+      },
+      "display-mobile": {
+        "displayName": "Display Mobile",
+        "purpose": "Home title under 760px."
+      },
+      "title-drawer": {
+        "displayName": "Title Drawer",
+        "purpose": "Business name in the drawer head."
+      },
+      "title-xs": {
+        "displayName": "Title XS",
+        "purpose": "Drawer section heads."
+      },
+      "numeral-xl": {
+        "displayName": "Numeral XL",
+        "purpose": "Drawer score."
+      },
+      "numeral-md": {
+        "displayName": "Numeral MD",
+        "purpose": "Lead-list scores."
+      },
+      "numeral-sm": {
+        "displayName": "Numeral SM",
+        "purpose": "Stage-rail counts."
+      },
+      "numeral-xs": {
+        "displayName": "Numeral XS",
+        "purpose": "Menu counts."
+      },
+      "lede": {
+        "displayName": "Lede",
+        "purpose": "Inicio lede, box-field and palette input values."
+      },
+      "body-ui": {
+        "displayName": "Body UI",
+        "purpose": "Working UI text: menu and palette rows, key-value rows, findings, run steps, status lines, dark inputs."
+      },
+      "input-mobile": {
+        "displayName": "Mobile Input Floor",
+        "purpose": "16px floor for inputs under 760px so iOS does not zoom."
+      },
+      "label-xs": {
+        "displayName": "Label XS",
+        "purpose": "Mobile bottom-nav labels only."
+      },
+      "button-tracked": {
+        "displayName": "Tracked Button",
+        "purpose": "Nav and dark-field pill buttons, uppercase."
+      }
+    },
+    "shadows": [
+      {
+        "name": "popover",
+        "value": "0 24px 48px -12px rgba(0, 0, 0, 0.7)",
+        "purpose": "Menus from the top bar."
+      },
+      {
+        "name": "palette",
+        "value": "0 32px 80px -16px rgba(0, 0, 0, 0.8)",
+        "purpose": "Cmd/Ctrl+K search."
+      },
+      {
+        "name": "drawer",
+        "value": "-24px 0 60px -20px rgba(0, 0, 0, 0.45)",
+        "purpose": "Business file sliding from the right."
+      },
+      {
+        "name": "menu-light",
+        "value": "0 18px 40px -12px rgba(0, 0, 0, 0.25)",
+        "purpose": "Row menus on paper."
+      },
+      {
+        "name": "tooltip",
+        "value": "0 10px 24px -6px rgba(0, 0, 0, 0.55)",
+        "purpose": "Dot tooltip."
+      },
+      {
+        "name": "toast",
+        "value": "0 12px 32px -8px rgba(0, 0, 0, 0.6)",
+        "purpose": "Toasts."
+      },
+      {
+        "name": "rail-fade-mask",
+        "value": "linear-gradient(to right, #000 calc(100% - 64px), transparent)",
+        "purpose": "mask-image on the stage rail under 1240px; #000 is an alpha stop, not a painted color."
+      },
+      {
+        "name": "focus-halo",
+        "value": "0 0 0 3px rgba(206, 0, 55, 0.14)",
+        "purpose": "Fields on focus, with crimson border."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.23, 1, 0.32, 1)",
+        "purpose": "All transitions and entrances."
+      },
+      {
+        "name": "t-fast",
+        "value": "140ms",
+        "purpose": "Hover, border and color changes, press scale."
+      },
+      {
+        "name": "t-base",
+        "value": "220ms",
+        "purpose": "Larger state changes."
+      },
+      {
+        "name": "dot-fill",
+        "value": "600ms",
+        "purpose": "Dot color cross-fade as checks land."
+      },
+      {
+        "name": "dot-check",
+        "value": "1.1s alternate infinite",
+        "purpose": "Pulse of a dot whose site is being checked."
+      },
+      {
+        "name": "beat",
+        "value": "1.4s infinite",
+        "purpose": "Crimson ring beat on live and busy dots."
+      },
+      {
+        "name": "drawer-in",
+        "value": "280ms",
+        "purpose": "Drawer slides 32px from the right."
+      },
+      {
+        "name": "pop-in",
+        "value": "180-200ms",
+        "purpose": "Popovers and palette."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone",
+        "value": "760px"
+      },
+      {
+        "name": "lead-card",
+        "value": "900px"
+      },
+      {
+        "name": "stack",
+        "value": "960px"
+      },
+      {
+        "name": "lead-compact",
+        "value": "1180px"
+      },
+      {
+        "name": "rail-fade",
+        "value": "1240px"
+      },
+      {
+        "name": "page-max",
+        "value": "1440px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one crimson action per view, e.g. Buscar negocios.",
+      "html": "<div class=\"ds-dark\"><button class=\"ds-btn-primary\">Buscar negocios</button></div>",
+      "css": ":host{--carbon:#0e0e0e;--carbon-2:#151515;--carbon-3:#1c1c1c;--paper:#f6f6f5;--niebla:#ecebeb;--ink:#111111;--ink-2:#4f4f4d;--ink-3:#666664;--on-dark:#f6f6f5;--on-dark-2:#b4b4b2;--on-dark-3:#8a8a88;--line-dark:#262626;--line-dark-strong:#3a3a3a;--line-light-strong:#c4c3c2;--crimson:#ce0037;--crimson-hover:#b50030;--vino:#6e0112;--crimson-soft:rgba(206,0,55,0.14);--amber:#f2c14e;--ease-out:cubic-bezier(0.23,1,0.32,1);} .ds-dark{background:var(--carbon);padding:24px;} .ds-btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 20px;border-radius:999px;border:1px solid transparent;font-family:Switzer,-apple-system,sans-serif;font-size:12px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;cursor:pointer;transition:background-color 140ms var(--ease-out),border-color 140ms var(--ease-out),transform 140ms var(--ease-out);background:var(--crimson);color:#fff;} .ds-btn-primary:hover{background:var(--crimson-hover);} .ds-btn-primary:active{background:var(--vino);transform:scale(0.97);} .ds-btn-primary:focus-visible{outline:2px solid var(--crimson);outline-offset:2px;}"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary action on the carbon field.",
+      "html": "<div class=\"ds-dark\"><button class=\"ds-btn-ghost\">Exportar CSV</button></div>",
+      "css": ":host{--carbon:#0e0e0e;--carbon-2:#151515;--carbon-3:#1c1c1c;--paper:#f6f6f5;--niebla:#ecebeb;--ink:#111111;--ink-2:#4f4f4d;--ink-3:#666664;--on-dark:#f6f6f5;--on-dark-2:#b4b4b2;--on-dark-3:#8a8a88;--line-dark:#262626;--line-dark-strong:#3a3a3a;--line-light-strong:#c4c3c2;--crimson:#ce0037;--crimson-hover:#b50030;--vino:#6e0112;--crimson-soft:rgba(206,0,55,0.14);--amber:#f2c14e;--ease-out:cubic-bezier(0.23,1,0.32,1);} .ds-dark{background:var(--carbon);padding:24px;} .ds-btn-ghost{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 20px;border-radius:999px;border:1px solid transparent;font-family:Switzer,-apple-system,sans-serif;font-size:12px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;cursor:pointer;transition:background-color 140ms var(--ease-out),border-color 140ms var(--ease-out),transform 140ms var(--ease-out);background:transparent;border-color:var(--line-dark-strong);color:var(--on-dark);} .ds-btn-ghost:hover{background:var(--carbon-3);border-color:#4a4a4a;} .ds-btn-ghost:active{transform:scale(0.97);} .ds-btn-ghost:focus-visible{outline:2px solid var(--crimson);outline-offset:2px;}"
+    },
+    {
+      "name": "Light Button",
+      "kind": "button",
+      "refersTo": "button-light",
+      "description": "Working button on niebla and paper; sentence case.",
+      "html": "<div class=\"ds-light\"><button class=\"ds-btn-light\">Ver en Google Maps</button></div>",
+      "css": ":host{--carbon:#0e0e0e;--carbon-2:#151515;--carbon-3:#1c1c1c;--paper:#f6f6f5;--niebla:#ecebeb;--ink:#111111;--ink-2:#4f4f4d;--ink-3:#666664;--on-dark:#f6f6f5;--on-dark-2:#b4b4b2;--on-dark-3:#8a8a88;--line-dark:#262626;--line-dark-strong:#3a3a3a;--line-light-strong:#c4c3c2;--crimson:#ce0037;--crimson-hover:#b50030;--vino:#6e0112;--crimson-soft:rgba(206,0,55,0.14);--amber:#f2c14e;--ease-out:cubic-bezier(0.23,1,0.32,1);} .ds-light{background:var(--niebla);padding:24px;} .ds-btn-light{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 20px;border-radius:999px;border:1px solid transparent;font-family:Switzer,-apple-system,sans-serif;font-size:12px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;cursor:pointer;transition:background-color 140ms var(--ease-out),border-color 140ms var(--ease-out),transform 140ms var(--ease-out);height:32px;padding:0 14px;background:var(--paper);border-color:var(--line-light-strong);color:var(--ink);text-transform:none;letter-spacing:0;font-size:13px;} .ds-btn-light:hover{border-color:var(--ink-3);} .ds-btn-light:active{transform:scale(0.97);} .ds-btn-light:focus-visible{outline:2px solid var(--crimson);outline-offset:2px;}"
+    },
+    {
+      "name": "WhatsApp Pills",
+      "kind": "button",
+      "refersTo": "whatsapp-confirmed",
+      "description": "Confirmed (filled ink), probe (outlined) and drawer primary (crimson).",
+      "html": "<div class=\"ds-light\"><a class=\"ds-wa\" href=\"#\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.9 20A9 9 0 1 0 4 16.1L2 22Z\"/></svg>WhatsApp</a><a class=\"ds-wa ds-wa-guess\" href=\"#\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.9 20A9 9 0 1 0 4 16.1L2 22Z\"/></svg>Probar WhatsApp</a><a class=\"ds-wa ds-wa-primary\" href=\"#\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.9 20A9 9 0 1 0 4 16.1L2 22Z\"/></svg>WhatsApp</a></div>",
+      "css": ":host{--carbon:#0e0e0e;--carbon-2:#151515;--carbon-3:#1c1c1c;--paper:#f6f6f5;--niebla:#ecebeb;--ink:#111111;--ink-2:#4f4f4d;--ink-3:#666664;--on-dark:#f6f6f5;--on-dark-2:#b4b4b2;--on-dark-3:#8a8a88;--line-dark:#262626;--line-dark-strong:#3a3a3a;--line-light-strong:#c4c3c2;--crimson:#ce0037;--crimson-hover:#b50030;--vino:#6e0112;--crimson-soft:rgba(206,0,55,0.14);--amber:#f2c14e;--ease-out:cubic-bezier(0.23,1,0.32,1);} .ds-light{background:var(--paper);padding:24px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;} .ds-wa{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 14px;border-radius:999px;font-family:Switzer,-apple-system,sans-serif;font-size:13px;font-weight:500;text-decoration:none;transition:background-color 140ms var(--ease-out);border:1px solid var(--ink);background:var(--ink);color:var(--paper);} .ds-wa:hover{background:#2a2a2a;border-color:#2a2a2a;} .ds-wa-guess{background:transparent;border-color:var(--line-light-strong);color:var(--ink-2);} .ds-wa-guess:hover{background:var(--paper);color:var(--ink);border-color:var(--ink-3);} .ds-wa-primary{background:var(--crimson);border-color:var(--crimson);color:#fff;height:44px;padding:0 20px;font-size:14px;} .ds-wa-primary:hover{background:var(--crimson-hover);border-color:var(--crimson-hover);} .ds-wa:focus-visible{outline:2px solid var(--crimson);outline-offset:2px;}"
+    },
+    {
+      "name": "Box Field",
+      "kind": "input",
+      "refersTo": "box-field",
+      "description": "Large home field with its label inside.",
+      "html": "<div class=\"ds-dark\"><label class=\"ds-box\"><span class=\"ds-label\">Giro</span><input placeholder=\"Dentistas, abogados, talleres…\"></label></div>",
+      "css": ":host{--carbon:#0e0e0e;--carbon-2:#151515;--carbon-3:#1c1c1c;--paper:#f6f6f5;--niebla:#ecebeb;--ink:#111111;--ink-2:#4f4f4d;--ink-3:#666664;--on-dark:#f6f6f5;--on-dark-2:#b4b4b2;--on-dark-3:#8a8a88;--line-dark:#262626;--line-dark-strong:#3a3a3a;--line-light-strong:#c4c3c2;--crimson:#ce0037;--crimson-hover:#b50030;--vino:#6e0112;--crimson-soft:rgba(206,0,55,0.14);--amber:#f2c14e;--ease-out:cubic-bezier(0.23,1,0.32,1);} .ds-dark{background:var(--carbon);padding:24px;} .ds-box{display:flex;flex-direction:column;justify-content:center;gap:2px;height:62px;padding:0 18px;border-radius:12px;border:1px solid var(--line-dark-strong);background:var(--carbon-2);transition:border-color 140ms var(--ease-out),box-shadow 140ms var(--ease-out);} .ds-box:focus-within{border-color:var(--crimson);box-shadow:0 0 0 3px var(--crimson-soft);} .ds-label{font-family:Switzer,sans-serif;font-size:11px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--on-dark-3);} .ds-box input{border:none;outline:none;background:transparent;font-family:Switzer,sans-serif;font-size:17px;color:var(--on-dark);caret-color:var(--crimson);} .ds-box input::placeholder{color:var(--on-dark-3);}"
+    },
+    {
+      "name": "Light Search",
+      "kind": "input",
+      "refersTo": "input-light",
+      "description": "Pill search in the niebla toolbar.",
+      "html": "<div class=\"ds-light\"><label class=\"ds-search\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/></svg><input placeholder=\"Buscar negocio, ciudad o dominio\"></label></div>",
+      "css": ":host{--carbon:#0e0e0e;--carbon-2:#151515;--carbon-3:#1c1c1c;--paper:#f6f6f5;--niebla:#ecebeb;--ink:#111111;--ink-2:#4f4f4d;--ink-3:#666664;--on-dark:#f6f6f5;--on-dark-2:#b4b4b2;--on-dark-3:#8a8a88;--line-dark:#262626;--line-dark-strong:#3a3a3a;--line-light-strong:#c4c3c2;--crimson:#ce0037;--crimson-hover:#b50030;--vino:#6e0112;--crimson-soft:rgba(206,0,55,0.14);--amber:#f2c14e;--ease-out:cubic-bezier(0.23,1,0.32,1);} .ds-light{background:var(--niebla);padding:24px;} .ds-search{position:relative;display:block;max-width:420px;} .ds-search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--ink-3);} .ds-search input{width:100%;height:40px;padding:0 14px 0 38px;border-radius:999px;border:1px solid var(--line-light-strong);background:var(--paper);color:var(--ink);font-family:Switzer,sans-serif;font-size:14px;outline:none;transition:border-color 140ms var(--ease-out),box-shadow 140ms var(--ease-out);} .ds-search input:focus{border-color:var(--crimson);box-shadow:0 0 0 3px var(--crimson-soft);} .ds-search input::placeholder{color:var(--ink-3);}"
+    },
+    {
+      "name": "Top Nav",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Tracked uppercase pills in the carbon top bar.",
+      "html": "<nav class=\"ds-nav\"><a href=\"#\" aria-current=\"page\">Inicio</a><a href=\"#\">Bases</a><a href=\"#\">Embudo</a></nav>",
+      "css": ":host{--carbon:#0e0e0e;--carbon-2:#151515;--carbon-3:#1c1c1c;--paper:#f6f6f5;--niebla:#ecebeb;--ink:#111111;--ink-2:#4f4f4d;--ink-3:#666664;--on-dark:#f6f6f5;--on-dark-2:#b4b4b2;--on-dark-3:#8a8a88;--line-dark:#262626;--line-dark-strong:#3a3a3a;--line-light-strong:#c4c3c2;--crimson:#ce0037;--crimson-hover:#b50030;--vino:#6e0112;--crimson-soft:rgba(206,0,55,0.14);--amber:#f2c14e;--ease-out:cubic-bezier(0.23,1,0.32,1);} .ds-nav{display:flex;gap:4px;background:var(--carbon);padding:15px 24px;} .ds-nav a{display:inline-flex;align-items:center;height:34px;padding:0 12px;border-radius:999px;font-family:Switzer,sans-serif;font-size:12px;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;color:var(--on-dark-2);text-decoration:none;transition:color 140ms var(--ease-out),background-color 140ms var(--ease-out);} .ds-nav a:hover{color:var(--on-dark);} .ds-nav a[aria-current=page]{color:var(--on-dark);background:var(--carbon-3);} .ds-nav a:focus-visible{outline:2px solid var(--crimson);outline-offset:2px;}"
+    },
+    {
+      "name": "Stage Chips",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Outlined status pills on carbon; tone from stage.",
+      "html": "<div class=\"ds-dark\"><span class=\"ds-chip\">Por revisar</span><span class=\"ds-chip ds-chip-accent\">Candidato</span><span class=\"ds-chip ds-chip-warn\">Revisión manual</span></div>",
+      "css": ":host{--carbon:#0e0e0e;--carbon-2:#151515;--carbon-3:#1c1c1c;--paper:#f6f6f5;--niebla:#ecebeb;--ink:#111111;--ink-2:#4f4f4d;--ink-3:#666664;--on-dark:#f6f6f5;--on-dark-2:#b4b4b2;--on-dark-3:#8a8a88;--line-dark:#262626;--line-dark-strong:#3a3a3a;--line-light-strong:#c4c3c2;--crimson:#ce0037;--crimson-hover:#b50030;--vino:#6e0112;--crimson-soft:rgba(206,0,55,0.14);--amber:#f2c14e;--ease-out:cubic-bezier(0.23,1,0.32,1);} .ds-dark{background:var(--carbon);padding:24px;display:flex;gap:8px;} .ds-chip{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:999px;border:1px solid var(--line-dark-strong);font-family:Switzer,sans-serif;font-size:12px;font-weight:500;color:var(--on-dark-2);} .ds-chip-accent{border-color:rgba(206,0,55,0.75);color:var(--on-dark);background:var(--crimson-soft);} .ds-chip-warn{border-color:rgba(242,193,78,0.45);color:var(--amber);background:rgba(242,193,78,0.16);}"
+    },
+    {
+      "name": "Dot Field with Legend",
+      "kind": "custom",
+      "refersTo": "dot",
+      "description": "Signature: one dot per business, the legend filters it.",
+      "html": "<div class=\"ds-dark\"><div class=\"ds-field\"><span class=\"ds-dot ds-dot-c\"></span><span class=\"ds-dot ds-dot-c\"></span><span class=\"ds-dot ds-dot-c\"></span><span class=\"ds-dot ds-dot-o\"></span><span class=\"ds-dot ds-dot-c\"></span><span class=\"ds-dot ds-dot-r\"></span><span class=\"ds-dot ds-dot-p\"></span><span class=\"ds-dot ds-dot-p\"></span><span class=\"ds-dot ds-dot-o\"></span><span class=\"ds-dot ds-dot-n\"></span><span class=\"ds-dot ds-dot-c\"></span><span class=\"ds-dot ds-dot-u\"></span><span class=\"ds-dot ds-dot-o\"></span><span class=\"ds-dot ds-dot-w\"></span><span class=\"ds-dot ds-dot-c\"></span><span class=\"ds-dot ds-dot-d\"></span><span class=\"ds-dot ds-dot-p\"></span><span class=\"ds-dot ds-dot-k\"></span><span class=\"ds-dot ds-dot-p\"></span><span class=\"ds-dot ds-dot-c\"></span><span class=\"ds-dot ds-dot-o\"></span><span class=\"ds-dot ds-dot-o\"></span><span class=\"ds-dot ds-dot-r\"></span><span class=\"ds-dot ds-dot-p\"></span><span class=\"ds-dot ds-dot-p\"></span><span class=\"ds-dot ds-dot-x\"></span><span class=\"ds-dot ds-dot-p\"></span><span class=\"ds-dot ds-dot-c\"></span><span class=\"ds-dot ds-dot-o\"></span><span class=\"ds-dot ds-dot-o\"></span><span class=\"ds-dot ds-dot-c\"></span><span class=\"ds-dot ds-dot-n\"></span><span class=\"ds-dot ds-dot-p\"></span><span class=\"ds-dot ds-dot-p\"></span></div><div class=\"ds-legend\"><button class=\"ds-li\" aria-pressed=\"true\"><span class=\"ds-dot ds-dot-c\"></span>Candidatos <b>9</b></button><button class=\"ds-li\" aria-pressed=\"false\"><span class=\"ds-dot ds-dot-o\"></span>Sitio aceptable <b>7</b></button><button class=\"ds-li\" aria-pressed=\"false\"><span class=\"ds-dot ds-dot-p\"></span>Por revisar <b>10</b></button></div></div>",
+      "css": ":host{--carbon:#0e0e0e;--carbon-2:#151515;--carbon-3:#1c1c1c;--paper:#f6f6f5;--niebla:#ecebeb;--ink:#111111;--ink-2:#4f4f4d;--ink-3:#666664;--on-dark:#f6f6f5;--on-dark-2:#b4b4b2;--on-dark-3:#8a8a88;--line-dark:#262626;--line-dark-strong:#3a3a3a;--line-light-strong:#c4c3c2;--crimson:#ce0037;--crimson-hover:#b50030;--vino:#6e0112;--crimson-soft:rgba(206,0,55,0.14);--amber:#f2c14e;--ease-out:cubic-bezier(0.23,1,0.32,1);} .ds-dark{background:var(--carbon-2);padding:24px;border-radius:18px;} .ds-field{display:flex;flex-wrap:wrap;gap:6px;max-width:260px;} .ds-dot{width:11px;height:11px;border-radius:50%;background:#2b2b2b;flex-shrink:0;transition:transform 240ms var(--ease-out),background-color 600ms var(--ease-out);} .ds-field .ds-dot:hover{transform:scale(1.6);} .ds-dot-c{background:var(--crimson);} .ds-dot-w{background:transparent;box-shadow:inset 0 0 0 2px var(--crimson);} .ds-dot-d{background:var(--crimson);box-shadow:inset 0 0 0 2px var(--paper);} .ds-dot-k{background:var(--paper);} .ds-dot-u{background:var(--amber);} .ds-dot-o{background:#858583;} .ds-dot-n{background:transparent;box-shadow:inset 0 0 0 1.5px #4d4d4b;} .ds-dot-r{background:var(--paper);animation:ds-check 1.1s var(--ease-out) infinite alternate;} .ds-dot-x{background:#1d1d1d;} @keyframes ds-check{from{opacity:.35}to{opacity:1}} .ds-legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:22px;} .ds-li{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 14px 0 12px;border-radius:999px;border:1px solid var(--line-dark-strong);background:transparent;color:var(--on-dark-2);font-family:Switzer,sans-serif;font-size:13px;cursor:pointer;} .ds-li .ds-dot{width:8px;height:8px;} .ds-li b{font-family:'Clash Grotesk',Switzer,sans-serif;font-weight:500;font-size:15px;color:var(--on-dark);} .ds-li:hover{border-color:#4f4f4d;color:var(--on-dark);} .ds-li[aria-pressed=true]{background:var(--paper);border-color:var(--paper);color:var(--ink);} .ds-li[aria-pressed=true] b{color:var(--ink);} .ds-li:focus-visible{outline:2px solid var(--crimson);outline-offset:2px;}"
+    },
+    {
+      "name": "Base Row",
+      "kind": "card",
+      "refersTo": "dot-candidate",
+      "description": "Recent base: Clash name and meta, its dot field, a large crimson candidate count.",
+      "html": "<div class=\"ds-dark\"><a class=\"ds-row\" href=\"#\"><div><div class=\"ds-row-title\">Abogados CDMX</div><div class=\"ds-row-meta\">100 negocios · hace 2 h</div></div><div class=\"ds-field\"><span class=\"ds-dot ds-dot-c\"></span><span class=\"ds-dot ds-dot-c\"></span><span class=\"ds-dot ds-dot-o\"></span><span class=\"ds-dot ds-dot-p\"></span><span class=\"ds-dot ds-dot-r\"></span><span class=\"ds-dot ds-dot-c\"></span><span class=\"ds-dot ds-dot-p\"></span><span class=\"ds-dot ds-dot-o\"></span><span class=\"ds-dot ds-dot-o\"></span><span class=\"ds-dot ds-dot-c\"></span><span class=\"ds-dot ds-dot-p\"></span><span class=\"ds-dot ds-dot-x\"></span><span class=\"ds-dot ds-dot-c\"></span><span class=\"ds-dot ds-dot-o\"></span><span class=\"ds-dot ds-dot-p\"></span><span class=\"ds-dot ds-dot-p\"></span><span class=\"ds-dot ds-dot-c\"></span><span class=\"ds-dot ds-dot-o\"></span><span class=\"ds-dot ds-dot-c\"></span><span class=\"ds-dot ds-dot-p\"></span><span class=\"ds-dot ds-dot-o\"></span></div><div class=\"ds-count\"><span>29</span><small>Candidatos</small></div></a></div>",
+      "css": ":host{--carbon:#0e0e0e;--carbon-2:#151515;--carbon-3:#1c1c1c;--paper:#f6f6f5;--niebla:#ecebeb;--ink:#111111;--ink-2:#4f4f4d;--ink-3:#666664;--on-dark:#f6f6f5;--on-dark-2:#b4b4b2;--on-dark-3:#8a8a88;--line-dark:#262626;--line-dark-strong:#3a3a3a;--line-light-strong:#c4c3c2;--crimson:#ce0037;--crimson-hover:#b50030;--vino:#6e0112;--crimson-soft:rgba(206,0,55,0.14);--amber:#f2c14e;--ease-out:cubic-bezier(0.23,1,0.32,1);} .ds-dark{background:var(--carbon);padding:16px;} .ds-row{display:grid;grid-template-columns:minmax(140px,200px) minmax(0,1fr) 96px;gap:28px;align-items:center;padding:20px 16px;border-radius:14px;color:var(--on-dark);text-decoration:none;transition:background-color 140ms var(--ease-out);} .ds-row:hover{background:var(--carbon-2);} .ds-row:focus-visible{outline:2px solid var(--crimson);outline-offset:2px;} .ds-row-title{font-family:'Clash Grotesk',Switzer,sans-serif;font-weight:500;font-size:22px;line-height:1.1;letter-spacing:-0.01em;} .ds-row-meta{font-family:Switzer,sans-serif;font-size:13px;color:var(--on-dark-3);margin-top:6px;} .ds-field{display:flex;flex-wrap:wrap;gap:5px;} .ds-dot{width:8px;height:8px;border-radius:50%;background:#2b2b2b;} .ds-dot-c{background:var(--crimson);} .ds-dot-o{background:#858583;} .ds-dot-x{background:#1d1d1d;} .ds-dot-r{background:var(--paper);} .ds-count{text-align:right;} .ds-count span{display:block;font-family:'Clash Grotesk',Switzer,sans-serif;font-weight:500;font-size:32px;line-height:1;color:var(--crimson);font-variant-numeric:tabular-nums;} .ds-count small{display:block;margin-top:6px;font-family:Switzer,sans-serif;font-size:11px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--on-dark-3);}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Living Field",
+    "overview": "Every business the team finds is a dot, and the app is a search box laid over the field of all those dots. The field fills as sites are checked: crimson where a redesign is due, grey where the site is fine, a pulsing ring while a check runs. Everything else in the system exists to frame that field and get the seller from a crimson dot to a WhatsApp conversation.\n\nThe world is hemeron.com's, put to work. Carbon fields hold the shell and every page header. Niebla fields sit under the lists you read, and paper panels carry the rows and the business file. One crimson carries every signal that matters. Display type is Clash Grotesk at 500 with a dimmed second line. Everything you read is Switzer with tabular figures. Density follows the job: page heads are calm and spacious, the lead list is dense and scannable, and on a phone it collapses to a stacked card per business.\n\nIt rejects the default admin look: no icon sidebar, no grid of stat cards, no spreadsheet of undifferentiated rows. Counts live in a thin stage rail and in large crimson numerals next to each base's field.",
+    "keyCharacteristics": [
+      "Two working fields: carbon (`#0e0e0e`) for frame and headers, niebla (`#ecebeb`) with paper panels for reading.",
+      "One accent, crimson, used for big numerals, the primary action and dots, never for small text.",
+      "Pills everywhere you click. Panels at 18px radius, fields at 12px.",
+      "Flat surfaces. Shadows appear only on things that float above the page.",
+      "The dot field is the signature, and it is live and linked."
+    ],
+    "rules": [
+      {
+        "name": "The One Crimson Rule",
+        "body": "`#ce0037` is the only accent. Its lighter pink sibling (`#ff5c80`) is retired. If something needs to stand out and it is not a candidate, a high score, the primary action or a live signal, it does not get crimson.",
+        "section": "colors"
+      },
+      {
+        "name": "The Big Crimson Rule",
+        "body": "Crimson text appears only at numeral size (20px and up). Small labels stay in ink, and their state is shown by a crimson dot or icon placed next to them.",
+        "section": "colors"
+      },
+      {
+        "name": "The Dimmed Second Line Rule",
+        "body": "Display and headline titles split into two lines. The second line is a quieter restatement in dim ink (`{colors.on-dark-dim}`), never a separate kicker above the title.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tracked-Is-Meta Rule",
+        "body": "Tracked uppercase is reserved for meta, legends, column heads, navigation and the pill buttons on the carbon field (`{typography.button-tracked}`). Working buttons on the light field, row actions and WhatsApp pills are sentence case.",
+        "section": "typography"
+      },
+      {
+        "name": "The Fields-Not-Shadows Rule",
+        "body": "To separate two regions, change the field (carbon, niebla, paper), not the shadow. Shadows are only for layers that float.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** frame every screen with a carbon head and put lists on a niebla field inside a paper panel.",
+      "**Do** show opportunity as a crimson numeral (20px and up) or a crimson dot. Keep the label beside it in ink.",
+      "**Do** use one crimson primary per view (Buscar negocios, Nueva búsqueda, Revisar sus sitios, the drawer's WhatsApp). Every other action is a ghost or light pill.",
+      "**Do** keep tracked uppercase for meta, legends, column heads, nav and the dark-field pill buttons. Use sentence case for light-field buttons, row actions and WhatsApp.",
+      "**Do** distinguish a confirmed WhatsApp (filled ink \"WhatsApp\") from a Maps-phone probe (outlined \"Probar WhatsApp\").",
+      "**Do** draw any new collection of businesses as a dot field using the shared state letters, linked both ways with its list.",
+      "**Do** use the 1440px page, 40/16px gutters and the 4px spacing steps."
+    ],
+    "donts": [
+      "**Don't** set small text (labels, chips, menu items, weights) in crimson. Use ink text with a crimson dot or icon.",
+      "**Don't** use `#ff5c80` or any second pink or red tint as an accent.",
+      "**Don't** add an icon sidebar, a grid of stat cards or a plain spreadsheet table. Counts go in the stage rail and beside the dot field.",
+      "**Don't** separate regions with shadows. Change the field instead, and keep shadows for layers that float.",
+      "**Don't** use square or slightly rounded buttons. Everything you press is a pill."
+    ]
+  }
+}

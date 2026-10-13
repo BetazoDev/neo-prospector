@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useRef, useCallback } from 'react'
+import { X } from 'lucide-react'
 
 interface ImportCSVModalProps {
   isOpen: boolean
   onClose: () => void
-  onImported: () => void
+  /** Recibe el id de la base nueva para poder abrirla. */
+  onImported: (jobId: number) => void
 }
 
 interface PreviewRow {
@@ -87,7 +89,7 @@ export default function ImportCSVModal({ isOpen, onClose, onImported }: ImportCS
 
       setProgress(100)
       setTimeout(() => {
-        onImported()
+        onImported(data.jobId)
         handleClose()
       }, 400)
     } catch (err) {
@@ -152,7 +154,7 @@ export default function ImportCSVModal({ isOpen, onClose, onImported }: ImportCS
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#fff',
+                color: 'var(--text-primary)',
               }}
             >
               <svg viewBox="0 0 16 16" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -161,7 +163,7 @@ export default function ImportCSVModal({ isOpen, onClose, onImported }: ImportCS
               </svg>
             </div>
             <div>
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>Importar CSV</div>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: 18, fontWeight: 500, color: 'var(--text-primary)' }}>Importar CSV</div>
               <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
                 Sube un CSV y se creará una base igual que con scraping
               </div>
@@ -183,7 +185,7 @@ export default function ImportCSVModal({ isOpen, onClose, onImported }: ImportCS
               justifyContent: 'center',
             }}
           >
-            ✕
+            <X aria-hidden="true" style={{ width: 16, height: 16 }} />
           </button>
         </div>
 
@@ -194,7 +196,7 @@ export default function ImportCSVModal({ isOpen, onClose, onImported }: ImportCS
           onDragLeave={handleDragLeave}
           onClick={() => !file && fileInputRef.current?.click()}
           style={{
-            border: `2px dashed ${isDragging ? 'var(--accent, #7c3aed)' : file ? '#10b981' : 'var(--border-default)'}`,
+            border: `2px dashed ${isDragging ? 'var(--accent)' : file ? 'var(--good)' : 'var(--border-default)'}`,
             borderRadius: 12,
             padding: '32px 20px',
             textAlign: 'center',
@@ -202,7 +204,7 @@ export default function ImportCSVModal({ isOpen, onClose, onImported }: ImportCS
             background: isDragging
               ? 'rgba(124,58,237,0.06)'
               : file
-              ? 'rgba(16,185,129,0.06)'
+              ? 'rgba(95,211,154,0.06)'
               : 'var(--bg-elevated)',
             transition: 'all 0.2s ease',
             marginBottom: 16,
@@ -222,19 +224,19 @@ export default function ImportCSVModal({ isOpen, onClose, onImported }: ImportCS
                   width: 44,
                   height: 44,
                   borderRadius: 10,
-                  background: 'rgba(16,185,129,0.15)',
+                  background: 'rgba(95,211,154,0.15)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                <svg viewBox="0 0 20 20" fill="none" stroke="#10b981" strokeWidth="1.8" style={{ width: 24, height: 24 }}>
+                <svg viewBox="0 0 20 20" fill="none" stroke="var(--good)" strokeWidth="1.8" style={{ width: 24, height: 24 }}>
                   <path d="M4 4h8l4 4v8H4V4z" strokeLinecap="round" strokeLinejoin="round" />
                   <path d="M12 4v4h4" strokeLinecap="round" strokeLinejoin="round" />
                   <path d="M7 12l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: '#10b981' }}>{file.name}</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--good)' }}>{file.name}</div>
               <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
                 {(file.size / 1024).toFixed(1)} KB
                 {preview ? ` · ${preview.rows.length}+ filas (preview)` : ''}
@@ -273,7 +275,7 @@ export default function ImportCSVModal({ isOpen, onClose, onImported }: ImportCS
                   <path d="M3 17h14" strokeLinecap="round" />
                 </svg>
               </div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: '#fff' }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
                 {isDragging ? 'Suelta el archivo aquí' : 'Arrastra un CSV o haz clic para seleccionar'}
               </div>
               <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
@@ -302,7 +304,7 @@ export default function ImportCSVModal({ isOpen, onClose, onImported }: ImportCS
                 border: '1px solid var(--border-default)',
                 borderRadius: 'var(--radius-md)',
                 padding: '9px 12px',
-                color: '#fff',
+                color: 'var(--text-primary)',
                 fontSize: 13,
                 outline: 'none',
               }}
@@ -331,7 +333,7 @@ export default function ImportCSVModal({ isOpen, onClose, onImported }: ImportCS
                   {preview.rows.map((row, i) => (
                     <tr key={i} style={{ borderBottom: i < preview.rows.length - 1 ? '1px solid var(--border-subtle)' : 'none' }}>
                       {preview.headers.map((h) => (
-                        <td key={h} style={{ padding: '5px 10px', color: '#fff', maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <td key={h} style={{ padding: '5px 10px', color: 'var(--text-primary)', maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {row[h] ?? ''}
                         </td>
                       ))}
@@ -345,7 +347,7 @@ export default function ImportCSVModal({ isOpen, onClose, onImported }: ImportCS
 
         {/* Error */}
         {error && (
-          <div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', color: '#ef4444', fontSize: 13, marginBottom: 16 }}>
+          <div style={{ padding: '10px 14px', borderRadius: 8, background: 'var(--accent-dim)', border: '1px solid rgba(206, 0, 55, 0.5)', color: 'var(--danger)', fontSize: 13, marginBottom: 16 }}>
             {error}
           </div>
         )}
@@ -354,7 +356,7 @@ export default function ImportCSVModal({ isOpen, onClose, onImported }: ImportCS
         {loading && (
           <div style={{ marginBottom: 16 }}>
             <div style={{ height: 4, background: 'var(--bg-elevated)', borderRadius: 4, overflow: 'hidden' }}>
-              <div style={{ height: '100%', width: `${progress}%`, background: 'linear-gradient(90deg, #7c3aed, #06b6d4)', borderRadius: 4, transition: 'width 0.4s ease' }} />
+              <div style={{ height: '100%', width: `${progress}%`, background: 'var(--accent)', borderRadius: 4, transition: 'width 0.4s ease' }} />
             </div>
             <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 6 }}>
               {progress < 40 ? 'Preparando archivo...' : progress < 80 ? 'Importando leads...' : '¡Casi listo!'}
@@ -384,10 +386,10 @@ export default function ImportCSVModal({ isOpen, onClose, onImported }: ImportCS
             onClick={handleImport}
             disabled={!file || loading}
             style={{
-              background: !file || loading ? 'var(--bg-elevated)' : 'var(--accent, #7c3aed)',
+              background: !file || loading ? 'var(--bg-elevated)' : 'var(--accent)',
               border: 'none',
               borderRadius: 'var(--radius-md)',
-              color: !file || loading ? 'var(--text-tertiary)' : '#fff',
+              color: !file || loading ? 'var(--text-tertiary)' : '#ffffff',
               cursor: !file || loading ? 'not-allowed' : 'pointer',
               fontSize: 13,
               fontWeight: 600,

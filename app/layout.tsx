@@ -1,11 +1,17 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import './globals.css'
+import './styles/shell.css'
+import './styles/components.css'
 
 export const metadata: Metadata = {
-  title: 'NeoProspector — Lead Intelligence Dashboard',
+  title: 'Hemeron Prospector',
   description:
-    'Dashboard de prospección de leads inteligente. Encuentra clientes potenciales en Google Maps con IA, gestiona tus leads y contáctalos por WhatsApp.',
-  keywords: 'prospección, leads, Google Maps, WhatsApp, IA, Apify',
+    'Prospección de Hemeron: encuentra negocios en Google Maps, revisa sus sitios y detecta a quién le hace falta un rediseño.',
+  robots: { index: false, follow: false },
+}
+
+export const viewport: Viewport = {
+  themeColor: '#0e0e0e',
 }
 
 export default function RootLayout({
@@ -15,7 +21,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className="app-layout">{children}</body>
+      <head>
+        {/* Clash Grotesk y Switzer, las tipografías de hemeron.com, desde su distribuidor oficial. */}
+        <link rel="preconnect" href="https://api.fontshare.com" crossOrigin="" />
+        <link
+          rel="stylesheet"
+          href="https://api.fontshare.com/v2/css?f[]=clash-grotesk@500,600&f[]=switzer@400,500,600&display=swap"
+        />
+      </head>
+      <body>{children}</body>
     </html>
   )
 }

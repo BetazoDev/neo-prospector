@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
+import { scheduleSiteChecks } from '@/lib/pipeline/site-checks'
+import { triageLead } from '@/lib/pipeline/triage'
 import Papa from 'papaparse'
 
 async function getUserId(req: NextRequest): Promise<string | null> {
@@ -88,7 +90,8 @@ export async function POST(req: NextRequest) {
       .join('')
       .slice(0, 2) || 'CS'
 
-    const PALETTE = ['#7c3aed', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#ec4899', '#8b5cf6', '#06b6d4']
+    // Tonos de la marca Hemeron para distinguir las bases sin romper la paleta.
+const PALETTE = ['#ce0037', '#6e0112', '#d7d8d7', '#b4b4b2', '#f2c14e', '#5fd39a', '#8a8a88', '#ecebeb']
     const colorIdx = baseName.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) % PALETTE.length
     const color = PALETTE[colorIdx]
 
@@ -112,6 +115,8 @@ export async function POST(req: NextRequest) {
         userId,
         jobId: job.id,
         ...mapped,
+        ...triageLead(mapped),
+        stageChangedAt: new Date(),
         rating: isNaN(mapped.rating as number) ? null : mapped.rating,
         reviewsCount: isNaN(mapped.reviewsCount as number) ? null : mapped.reviewsCount,
       }
@@ -125,6 +130,8 @@ export async function POST(req: NextRequest) {
       where: { id: job.id },
       data: { status: 'done', leadsFound: created.length },
     })
+
+    scheduleSiteChecks({ userId, jobId: job.id })
 
     return NextResponse.json({ success: true, jobId: job.id, count: created.length })
   } catch (error) {

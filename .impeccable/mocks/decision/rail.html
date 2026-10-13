@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><title>Riel Hemeron</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1440px;height:900px;overflow:hidden;background:#ecebeb;color:#111;font-family:Switzer,'Helvetica Neue',Arial,sans-serif;display:grid;grid-template-columns:248px 1fr}
+.rail{background:#0e0e0e;color:#f6f6f5;padding:24px 18px;display:flex;flex-direction:column;gap:22px}
+.logo{font-family:'Clash Grotesk','Helvetica Neue',Arial,sans-serif;font-size:24px;font-weight:500}
+.cmd{height:36px;border:1px solid #2c2c2c;border-radius:10px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;color:#8a8a88;font-size:13px}
+.new{height:40px;border-radius:999px;background:#ce0037;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;letter-spacing:.07em;text-transform:uppercase;font-weight:500}
+.lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8a8a88;margin-bottom:8px}
+.item{display:flex;justify-content:space-between;align-items:center;height:34px;padding:0 10px;border-radius:8px;font-size:14px;color:#b4b4b2}
+.item.on{background:#1b1b1b;color:#f6f6f5;box-shadow:inset 2px 0 0 #ce0037}
+.item b{font-weight:500;font-variant-numeric:tabular-nums;color:#f6f6f5}
+.item .hot{color:#ff5c80}
+.agent{margin-top:auto;background:#141414;border:1px solid #222;border-radius:14px;padding:14px}
+.agent .h{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8a8a88}
+.agent .h span:last-child{color:#ff5c80}
+.agent p{font-size:13px;margin-top:10px;color:#f6f6f5}
+.bar{height:4px;border-radius:9px;background:#2b2b2b;margin-top:10px}.bar i{display:block;height:4px;width:52%;border-radius:9px;background:#ce0037}
+.agent small{display:block;margin-top:8px;font-size:12px;color:#8a8a88}
+main{padding:40px 56px;display:flex;flex-direction:column;gap:32px}
+.hero{background:#0e0e0e;color:#f6f6f5;border-radius:24px;padding:44px 48px;display:grid;grid-template-columns:1fr 520px;gap:48px;align-items:end}
+h1{font-family:'Clash Grotesk','Helvetica Neue',Arial,sans-serif;font-weight:500;font-size:56px;line-height:1;letter-spacing:-.03em}
+h1 span{display:block;color:#6f6f6d}
+.hero p{margin-top:18px;font-size:16px;color:rgba(246,246,245,.72);max-width:420px;line-height:1.55}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.f{height:54px;background:#141414;border:1px solid #2c2c2c;border-radius:12px;padding:8px 16px}
+.f small{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#8a8a88}.f div{font-size:16px;margin-top:2px}
+.go{grid-column:span 2;height:50px;border-radius:999px;background:#ce0037;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;letter-spacing:.07em;text-transform:uppercase;font-weight:500}
+.sec{display:flex;justify-content:space-between;align-items:baseline}
+h2{font-family:'Clash Grotesk','Helvetica Neue',Arial,sans-serif;font-weight:500;font-size:30px;letter-spacing:-.02em}
+.sec span{font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:#6f6f6d}
+.list{background:#f6f6f5;border-radius:18px;border:1px solid #d7d8d7}
+.r{display:grid;grid-template-columns:1fr 360px 120px 120px;gap:24px;align-items:center;padding:20px 28px;border-top:1px solid #e2e1e0}
+.r:first-child{border-top:none}
+.r h3{font-size:17px;font-weight:600}.r p{font-size:13px;color:#6f6f6d;margin-top:3px}
+.fun{display:flex;height:8px;border-radius:9px;overflow:hidden;background:#d7d8d7}
+.fun i{display:block}.c{background:#ce0037}.o{background:#8a8a88}.p{background:#b4b4b2}
+.n{font-family:'Clash Grotesk','Helvetica Neue',Arial,sans-serif;font-size:26px;text-align:right;color:#ce0037}
+.n small,.m small{display:block;font-family:Switzer,Arial,sans-serif;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#6f6f6d}
+.m{font-family:'Clash Grotesk','Helvetica Neue',Arial,sans-serif;font-size:26px;text-align:right}
+</style></head><body>
+<aside class="rail">
+  <div class="logo">hemeron</div>
+  <div class="cmd">Buscar en todo <span>⌘K</span></div>
+  <div class="new">Buscar negocios</div>
+  <div><div class="lbl">Embudo</div>
+    <div class="item on">Candidatos <b class="hot">46</b></div>
+    <div class="item">Demo lista <b>0</b></div>
+    <div class="item">Por contactar <b>6</b></div>
+    <div class="item">Respondieron <b>0</b></div>
+    <div class="item">Clientes <b>0</b></div></div>
+  <div><div class="lbl">Recientes</div>
+    <div class="item">Abogados CDMX · base 5 <b>29</b></div>
+    <div class="item">Dentistas · Querétaro <b>6</b></div>
+    <div class="item">Gimnasios · Ags <b>11</b></div></div>
+  <div class="agent"><div class="h"><span>Actividad</span><span>En vivo</span></div>
+    <p>Revisando sitios de Abogados CDMX</p><div class="bar"><i></i></div><small>33 de 63 · servidor</small></div>
+</aside>
+<main>
+  <section class="hero">
+    <div><h1>¿Qué negocios<span>buscamos hoy?</span></h1><p>Un giro y una zona. Buscamos en Google Maps y revisamos el sitio de cada negocio.</p></div>
+    <div class="form"><div class="f"><small>Giro</small><div>Dentistas</div></div><div class="f"><small>Zona</small><div>Querétaro, México</div></div><div class="go">Buscar negocios</div></div>
+  </section>
+  <div class="sec"><h2>Bases recientes</h2><span>Ver todas</span></div>
+  <div class="list">
+    <div class="r"><div><h3>Abogados CDMX · base 5</h3><p>Hoy · 100 negocios · revisando sitios</p></div><div class="fun"><i class="c" style="width:29%"></i><i class="o" style="width:34%"></i><i class="p" style="width:37%"></i></div><div class="m">100<small>negocios</small></div><div class="n">29<small>candidatos</small></div></div>
+    <div class="r"><div><h3>Dentistas · Querétaro</h3><p>Ayer · 48 negocios · ejemplo</p></div><div class="fun"><i class="c" style="width:13%"></i><i class="o" style="width:52%"></i><i class="p" style="width:35%"></i></div><div class="m">48<small>negocios</small></div><div class="n">6<small>candidatos</small></div></div>
+    <div class="r"><div><h3>Gimnasios · Aguascalientes</h3><p>Hace 3 días · 72 negocios · ejemplo</p></div><div class="fun"><i class="c" style="width:15%"></i><i class="o" style="width:40%"></i><i class="p" style="width:45%"></i></div><div class="m">72<small>negocios</small></div><div class="n">11<small>candidatos</small></div></div>
+  </div>
+</main>
+</body></html>

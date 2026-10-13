@@ -20,6 +20,7 @@ export interface ApifyLead {
   website?: string
   url?: string
   countryCode?: string
+  placeId?: string
   location?: { lat: number; lng: number }
 }
 
