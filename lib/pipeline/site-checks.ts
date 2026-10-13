@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../prisma'
 import { analyzeSite, stageForAnalysis, type SiteAnalysis } from './analyze-site'
 import { fetchSite, FetchFailure } from './fetch-site'
+import { enqueueCandidate } from './demo-jobs'
 import { AUTO_STAGES, type Stage } from './stages'
 import { normalizeWebsite, triageLead } from './triage'
 
@@ -173,10 +174,12 @@ async function checkOne(lead: ClaimedLead): Promise<void> {
       data: { ...data, checkState: 'done', checkError: null, checkClaimedAt: null },
     })
     // La etapa solo se mueve si nadie la cambió a mano mientras se revisaba.
-    await prisma.lead.updateMany({
+    const moved = await prisma.lead.updateMany({
       where: { id: lead.id, stage: { in: [...AUTO_STAGES] } },
       data: { stage: nextStage, stageChangedAt: new Date() },
     })
+    // Un candidato nuevo entra solo a la cola de demos; el worker de la Mac lo toma.
+    if (moved.count === 1 && nextStage === 'candidate') await enqueueCandidate(lead.userId, lead.id)
   } catch (error) {
     console.error(`[site-check] lead ${lead.id}:`, error)
     await prisma.lead.update({

@@ -35,6 +35,8 @@ export interface Lead {
   siteIssues: SiteIssue[] | null
   siteScore: number | null
   siteWhatsapp: string[]
+  demoUrl: string | null
+  demoSlug: string | null
   job?: { id: number; name: string | null; niche: string; zone: string }
 }
 

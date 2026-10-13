@@ -29,37 +29,37 @@ model User {
 }
 
 model ScrapingJob {
-  id         Int      @id @default(autoincrement())
-  userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id             Int      @id @default(autoincrement())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   /// Nombre editable de la base (por defecto: "Niche · Zone")
-  name       String?
+  name           String?
   /// Iniciales para el avatar de la card (2 chars)
-  icon       String?  @default("NP")
+  icon           String?  @default("NP")
   /// Color hex del avatar
-  color      String?  @default("#7c3aed")
-  niche      String
-  zone       String
-  status     String   @default("pending") // pending | running | importing | done | error
-  leadsFound Int      @default(0)
-  apifyRunId String?
+  color          String?  @default("#7c3aed")
+  niche          String
+  zone           String
+  status         String   @default("pending") // pending | running | importing | done | error
+  leadsFound     Int      @default(0)
+  apifyRunId     String?
   /// Dataset de la corrida, para poder recuperar los resultados más tarde.
   apifyDatasetId String?
   /// Secreto que autentica el webhook de Apify para esta base concreta.
   webhookToken   String?
-  error      String?
-  leads      Lead[]
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  error          String?
+  leads          Lead[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   @@map("scraping_jobs")
 }
 
 model Lead {
-  id           Int          @id @default(autoincrement())
+  id           Int         @id @default(autoincrement())
   userId       String
   jobId        Int
-  job          ScrapingJob  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  job          ScrapingJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
   title        String
   phone        String?
   rating       Float?
@@ -72,7 +72,7 @@ model Lead {
   searchNiche  String?
   searchZone   String?
   countryCode  String?
-  createdAt    DateTime     @default(now())
+  createdAt    DateTime    @default(now())
 
   /// Identificador del lugar en Google Maps: el mismo negocio puede salir en varias bases.
   placeId        String?
@@ -83,7 +83,7 @@ model Lead {
   /// Teléfono de Maps solo con dígitos y código de país, listo para wa.me.
   phoneDigits    String?
   /// Etapa del embudo; los valores viven en lib/pipeline/stages.ts.
-  stage          String       @default("new")
+  stage          String    @default("new")
   stageChangedAt DateTime?
 
   /// Cola de la revisión del sitio: pending | running | done | error | skipped
@@ -102,10 +102,67 @@ model Lead {
   /// Qué tan buena oportunidad de rediseño es (0-100): más alto, peor está el sitio.
   siteScore      Int?
   /// Números de WhatsApp que el propio sitio publica (wa.me, api.whatsapp.com).
-  siteWhatsapp   String[]     @default([])
+  siteWhatsapp   String[]  @default([])
+
+  /// Demo publicada para este negocio (la última que terminó bien).
+  demoUrl  String?
+  demoSlug String?
+  demoJobs DemoJob[]
 
   @@index([userId, stage])
   @@index([jobId, checkState])
   @@index([domain])
   @@map("leads")
+}
+
+/// Trabajo de demo para un negocio. Lo toma el worker de la Mac, que lo lleva por
+/// auditoría visual, investigación, construcción y publicación.
+model DemoJob {
+  id          Int       @id @default(autoincrement())
+  userId      String
+  leadId      Int
+  lead        Lead      @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  /// queued | running | published | skipped | failed | canceled
+  status      String    @default("queued")
+  /// audit | research | build | publish, mientras corre
+  step        String?
+  /// Avance para la ficha: [{ at, step, text }]
+  log         Json      @default("[]")
+  workerId    String?
+  claimedAt   DateTime?
+  heartbeatAt DateTime?
+  attempts    Int       @default(0)
+  /// Pedida a mano después de que la auditoría dijo que no: se construye sin ese filtro.
+  forced      Boolean   @default(false)
+  /// Hasta cuándo esperar antes de volver a intentarlo (límites del plan, red).
+  notBefore   DateTime?
+  slug        String?
+  demoUrl     String?
+  /// Auditoría visual: { eligible, score, reasons[], hook }
+  audit       Json?
+  /// Resumen de la investigación: { whatsapp, confidence, viability, doubts[] }
+  research    Json?
+  error       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([status, createdAt])
+  @@index([leadId])
+  @@index([userId, status])
+  @@map("demo_jobs")
+}
+
+/// Equipos que corren el worker. Sirve para mostrar si la Mac está en línea.
+model Worker {
+  id          String    @id
+  lastSeenAt  DateTime
+  version     String?
+  running     Int       @default(0)
+  capacity    Int       @default(1)
+  /// Si el plan de Claude llegó a su límite (o Claude perdió la sesión), hasta cuándo pausa.
+  pausedUntil DateTime?
+  /// limit | auth
+  pauseReason String?
+
+  @@map("workers")
 }

@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // El worker de la Mac es un paquete aparte con su propio tsconfig.
+    "worker/**",
   ]),
 ]);
 

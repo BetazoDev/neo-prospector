@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
 import { scheduleSiteChecks } from '@/lib/pipeline/site-checks'
+import { demoActivity } from '@/lib/pipeline/demo-jobs'
 
 export const dynamic = 'force-dynamic'
 
@@ -67,6 +68,8 @@ export async function GET(req: NextRequest) {
     if (entry.pending > 0) scheduleSiteChecks({ userId, jobId })
   }
 
+  const demos = await demoActivity(userId)
+
   const candidatesByJob = await prisma.lead.groupBy({
     by: ['jobId'],
     where: { userId, stage: 'candidate', jobId: { in: recent.map((j) => j.id) } },
@@ -75,6 +78,7 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({
     stages,
+    demos,
     recent: recent.map((job) => ({
       id: job.id,
       name: job.name || `${job.niche} · ${job.zone}`,
@@ -89,6 +93,13 @@ export async function GET(req: NextRequest) {
         name: job.name || `${job.niche} · ${job.zone}`,
         status: job.status,
         startedAt: job.createdAt,
+      })),
+      ...demos.running.map((d) => ({
+        kind: 'demo' as const,
+        jobId: d.baseId,
+        leadId: d.leadId,
+        name: d.title,
+        step: d.step,
       })),
       ...activeChecks.map(([jobId, e]) => ({
         kind: 'checks' as const,

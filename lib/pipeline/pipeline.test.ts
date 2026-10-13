@@ -118,6 +118,14 @@ describe('analyzeSite', () => {
     assert.equal(analysis.status, 'parked')
   })
 
+  it('detecta la página de bienvenida del hosting', () => {
+    const akky = '<html><head><title>Akky Hosting</title></head><body><h1>Sigue adelante con Akky</h1><p>Inicia con las mejores herramientas tu Proyecto en Internet.</p></body></html>'
+    const analysis = analyzeSite(page(akky), { now: NOW })
+    assert.equal(analysis.status, 'parked')
+    assert.equal(analysis.issues[0].code, 'hosting_placeholder')
+    assert.equal(stageForAnalysis(analysis), 'candidate')
+  })
+
   it('suma los problemas de un sitio viejo', () => {
     const old = `<html><head><title>Abogados</title></head><body><font>a</font><font>b</font><font>c</font><font>d</font><font>e</font>
       <p>${filler}</p><a href="/movil/index.html">Versión móvil</a><p>Copyright © 2015 Abogados</p></body></html>`

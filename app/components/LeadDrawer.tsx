@@ -7,6 +7,7 @@ import { HIGH_SCORE } from '@/lib/pipeline/labels'
 import { getWaUrl } from '@/lib/whatsapp'
 import type { Lead, LeadAction } from './lead-types'
 import { findings, SiteChip, siteHref, StageChip, WhatsAppButton } from './LeadBits'
+import DemoPanel from './DemoPanel'
 
 interface LeadDrawerProps {
   lead: Lead | null
@@ -18,6 +19,9 @@ interface LeadDrawerProps {
   onPrev?: () => void
   onNext?: () => void
   showBase?: boolean
+  /** La cola de demos cambió desde la ficha: refrescar lista y barra. */
+  onDemoChanged?: () => void
+  toast?: (title: string, desc?: string, type?: 'success' | 'error') => void
 }
 
 function formatDigits(digits: string): string {
@@ -36,7 +40,18 @@ function formatDate(value: string | null): string {
 }
 
 /** Ficha de un negocio: por qué necesita un sitio nuevo, qué se sabe de su sitio y cómo escribirle. */
-export default function LeadDrawer({ lead, onClose, onAction, busy = false, position, onPrev, onNext, showBase }: LeadDrawerProps) {
+export default function LeadDrawer({
+  lead,
+  onClose,
+  onAction,
+  busy = false,
+  position,
+  onPrev,
+  onNext,
+  showBase,
+  onDemoChanged = () => {},
+  toast = () => {},
+}: LeadDrawerProps) {
   const closeRef = useRef<HTMLButtonElement>(null)
   const open = !!lead
 
@@ -122,6 +137,8 @@ export default function LeadDrawer({ lead, onClose, onAction, busy = false, posi
         </div>
 
         <div className="drawer-body">
+          <DemoPanel key={lead.id} lead={lead} onChanged={onDemoChanged} toast={toast} />
+
           <section className="drawer-section">
             <h3>
               Por qué <span className="label">peso</span>

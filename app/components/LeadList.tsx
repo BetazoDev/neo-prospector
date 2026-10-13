@@ -177,6 +177,11 @@ export default function LeadList({
                 </a>
               )}
               <SiteChip lead={lead} />
+              {lead.demoUrl && (
+                <a href={lead.demoUrl} target="_blank" rel="noopener noreferrer" className="demo-chip" onClick={(e) => e.stopPropagation()}>
+                  Ver demo
+                </a>
+              )}
             </div>
             <div className="lead-whybox" style={{ minWidth: 0 }}>
               <div className={`lead-why${all.length === 0 ? ' is-quiet' : ''}`}>{whyLine(lead)}</div>

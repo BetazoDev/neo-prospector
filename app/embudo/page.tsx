@@ -171,6 +171,11 @@ function Funnel() {
         position={openIndex >= 0 ? { index: openIndex, total: leads.length } : null}
         onPrev={() => openIndex > 0 && setOpenLead(leads[openIndex - 1])}
         onNext={() => openIndex >= 0 && openIndex < leads.length - 1 && setOpenLead(leads[openIndex + 1])}
+        toast={toast}
+        onDemoChanged={() => {
+          load(page, { quiet: true })
+          refreshShell()
+        }}
       />
     </>
   )

@@ -75,6 +75,9 @@ const PARKED =
   /domain (name )?is for sale|buy this domain|this domain may be for sale|dominio (est[aá] )?(a la )?venta|comprar este dominio|parked (free|domain)|domain parking|sedoparking|parkingcrew|bodis\.com|afternic|hugedomains|\bdan\.com|this domain has expired|domain has expired|el dominio ha (expirado|caducado)|future home of something quite cool|this web page is parked/i
 const DEFAULT_PAGE =
   /<title>\s*index of \/|apache2 (ubuntu|debian) default page|welcome to nginx!|<title>\s*it works!?\s*<\/title>|default web site page|web server'?s default page|<title>\s*iis windows server|cpanel, inc\. - default/i
+/** Bienvenida del proveedor de hosting o del registrador: el dominio existe, el sitio no. */
+const HOSTING_PLACEHOLDER =
+  /akky hosting|sigue adelante con akky|this domain (has been|was) registered (with|at|by)|este dominio (ha sido|fue) registrado|dominio registrado (con|en) |your hosting( account)? is (ready|active|set up)|tu hosting (ya )?est[aá] (listo|activo)|there'?s nothing here,? yet|aqu[ií] no hay nada (todav[ií]a|a[uú]n)/i
 const CONSTRUCTION =
   /en construcci[oó]n|under construction|coming soon|pr[oó]ximamente|sitio en mantenimiento|estamos en mantenimiento|modo mantenimiento|maintenance mode|volveremos pronto|we'?ll be back soon|be right back|estamos trabajando en (nuestro|el) (nuevo )?sitio/i
 
@@ -277,6 +280,9 @@ export function analyzeSite(result: FetchedPage | FetchFailure, options: Analyze
   } else if (PARKED.test(text) && shortPage) {
     status = 'parked'
     add('parked', 'Dominio estacionado, en venta o vencido', 90)
+  } else if (HOSTING_PLACEHOLDER.test(`${title ?? ''} ${text}`) && shortPage) {
+    status = 'parked'
+    add('hosting_placeholder', 'Muestra la página de bienvenida de su proveedor de hosting', 90)
   } else if (DEFAULT_PAGE.test(html) && shortPage) {
     status = 'parked'
     add('default_page', 'Muestra la página por defecto del servidor', 85)

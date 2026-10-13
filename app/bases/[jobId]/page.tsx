@@ -327,7 +327,27 @@ function BaseDetail({ jobId }: { jobId: number }) {
     [leads, openIndex]
   )
 
-  const counts = useMemo(() => countDots(base?.dots ?? ''), [base?.dots])
+  const dots = base?.dots ?? ''
+  const counts = useMemo(() => countDots(dots), [dots])
+
+  // Los candidatos que llegaron antes de la cola automática se pueden mandar todos de una vez.
+  const queueCandidates = async () => {
+    const n = counts.c ?? 0
+    if (!n || !window.confirm(`¿Preparar la demo de los ${n} candidatos? La Mac los toma en orden y cada uno pasa por auditoría, investigación y construcción.`)) return
+    const res = await fetch('/api/demos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jobId }),
+    }).catch(() => null)
+    const data = await res?.json().catch(() => ({}))
+    if (res?.ok) {
+      toast('Demos en cola', `${data.queued} negocios esperan a la Mac.`)
+      loadBase()
+      loadLeads(page, { quiet: true })
+      refreshShell()
+    } else toast('No se pudieron poner en cola', data?.error ?? 'Intenta de nuevo.', 'error')
+  }
+
   const activeLegend = LEGEND.find((l) => l.segment === segment)
   const title = base ? base.name || `${base.niche} · ${base.zone}` : ''
   const queue = progress ? progress.done + progress.pending + progress.running + progress.failed : 0
@@ -491,6 +511,11 @@ function BaseDetail({ jobId }: { jobId: number }) {
                     </button>
                   )
                 })}
+                {(counts.c ?? 0) > 0 && (
+                  <button type="button" className="btn btn-primary btn-sm legend-cta" onClick={queueCandidates}>
+                    Preparar demos de {counts.c} candidato{counts.c === 1 ? '' : 's'}
+                  </button>
+                )}
               </div>
             </div>
           )}
@@ -554,6 +579,12 @@ function BaseDetail({ jobId }: { jobId: number }) {
         position={openIndex >= 0 ? { index: openIndex, total: leads.length } : null}
         onPrev={() => step(-1)}
         onNext={() => step(1)}
+        toast={toast}
+        onDemoChanged={() => {
+          loadBase()
+          loadLeads(page, { quiet: true })
+          refreshShell()
+        }}
       />
     </>
   )

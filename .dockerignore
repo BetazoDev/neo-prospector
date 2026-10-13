@@ -8,3 +8,5 @@ node_modules
 *.db-journal
 prisma/dev.db
 prisma/prod.db
+# El worker corre en la Mac, no en el contenedor
+worker

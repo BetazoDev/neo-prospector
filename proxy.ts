@@ -11,9 +11,11 @@ export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
 
   // Allow static Next.js assets
+  // El worker de la Mac se autentica con WORKER_TOKEN en cada ruta, no con la cookie.
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/static') ||
+    pathname.startsWith('/api/worker/') ||
     PUBLIC_PATHS.includes(pathname)
   ) {
     return NextResponse.next()
